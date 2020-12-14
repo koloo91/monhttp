@@ -1,0 +1,18 @@
+#create-service-component {
+  mat-card {
+    margin-top: 32px;
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+
+    p {
+      flex-grow: 2;
+    }
+
+    mat-form-field, mat-slider {
+      flex-grow: 8;
+    }
+  }
+}
