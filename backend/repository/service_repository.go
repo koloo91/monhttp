@@ -9,8 +9,11 @@ import (
 )
 
 var (
-	insertServiceStatement  *sql.Stmt
-	selectServicesStatement *sql.Stmt
+	insertServiceStatement     *sql.Stmt
+	selectServicesStatement    *sql.Stmt
+	selectServiceByIdStatement *sql.Stmt
+	updateServiceByIdStatement *sql.Stmt
+	deleteServiceByIdStatement *sql.Stmt
 )
 
 func prepareServiceStatements() {
@@ -26,24 +29,76 @@ func prepareServiceStatements() {
 	}
 
 	selectServicesStatement, err = db.Prepare(`SELECT id,
-						   name,
-						   type,
-						   interval_in_seconds,
-						   next_check_time,
-						   endpoint,
-						   http_method,
-						   request_timeout_in_seconds,
-						   http_headers,
-						   http_body,
-						   expected_http_response_body,
-						   expected_http_status_code,
-						   follow_redirects,
-						   verify_ssl,
-						   enable_notifications,
-						   notify_after_number_of_failures,
-						   created_at,
-						   updated_at
-					FROM service;`)
+															   name,
+															   type,
+															   interval_in_seconds,
+															   next_check_time,
+															   endpoint,
+															   http_method,
+															   request_timeout_in_seconds,
+															   http_headers,
+															   http_body,
+															   expected_http_response_body,
+															   expected_http_status_code,
+															   follow_redirects,
+															   verify_ssl,
+															   enable_notifications,
+															   notify_after_number_of_failures,
+															   created_at,
+															   updated_at
+														FROM service;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	selectServiceByIdStatement, err = db.Prepare(`SELECT id,
+															   name,
+															   type,
+															   interval_in_seconds,
+															   next_check_time,
+															   endpoint,
+															   http_method,
+															   request_timeout_in_seconds,
+															   http_headers,
+															   http_body,
+															   expected_http_response_body,
+															   expected_http_status_code,
+															   follow_redirects,
+															   verify_ssl,
+															   enable_notifications,
+															   notify_after_number_of_failures,
+															   created_at,
+															   updated_at
+														FROM service WHERE id = $1;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	updateServiceByIdStatement, err = db.Prepare(`UPDATE service
+														SET name=$2,
+															type=$3,
+															interval_in_seconds=$4,
+															next_check_time=$5,
+															endpoint=$6,
+															http_method=$7,
+															request_timeout_in_seconds=$8,
+															http_headers=$9,
+															http_body=$10,
+															expected_http_response_body=$11,
+															expected_http_status_code=$12,
+															follow_redirects=$13,
+															verify_ssl=$14,
+															enable_notifications=$15,
+															notify_after_number_of_failures=$16,
+															updated_at=$17
+														WHERE id = $1;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	deleteServiceByIdStatement, err = db.Prepare(`DELETE
+														FROM service
+														WHERE id = $1;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,4 +164,59 @@ func SelectServices(ctx context.Context) ([]model.Service, error) {
 	}
 
 	return result, nil
+}
+
+func SelectServiceById(ctx context.Context, serviceId string) (model.Service, error) {
+	row := selectServiceByIdStatement.QueryRowContext(ctx, serviceId)
+
+	var id, name, endpoint, httpMethod, httpHeaders, httpBody, expectedHttpResponseBody string
+	var serviceType model.ServiceType
+	var intervalInSeconds, requestTimeoutInSeconds, expectedHttpStatusCode, notifyAfterNumberOfFailures int
+	var followRedirects, verifySsl, enableNotifications bool
+	var nextCheckTime, createdAt, updatedAt time.Time
+
+	if err := row.Scan(&id, &name, &serviceType, &intervalInSeconds, &nextCheckTime, &endpoint, &httpMethod,
+		&requestTimeoutInSeconds, &httpHeaders, &httpBody, &expectedHttpResponseBody,
+		&expectedHttpStatusCode, &followRedirects, &verifySsl, &enableNotifications,
+		&notifyAfterNumberOfFailures, &createdAt, &updatedAt); err != nil {
+		return model.Service{}, err
+	}
+
+	return model.Service{
+		Id:                          id,
+		Name:                        name,
+		Type:                        serviceType,
+		IntervalInSeconds:           intervalInSeconds,
+		NextCheckTime:               nextCheckTime,
+		Endpoint:                    endpoint,
+		HttpMethod:                  httpMethod,
+		RequestTimeoutInSeconds:     requestTimeoutInSeconds,
+		HttpHeaders:                 httpHeaders,
+		HttpBody:                    httpBody,
+		ExpectedHttpResponseBody:    expectedHttpResponseBody,
+		ExpectedHttpStatusCode:      expectedHttpStatusCode,
+		FollowRedirects:             followRedirects,
+		VerifySsl:                   verifySsl,
+		EnableNotifications:         enableNotifications,
+		NotifyAfterNumberOfFailures: notifyAfterNumberOfFailures,
+		CreatedAt:                   createdAt,
+		UpdatedAt:                   updatedAt,
+	}, nil
+}
+
+func UpdateServiceById(ctx context.Context, serviceId string, service model.Service) error {
+	if _, err := updateServiceByIdStatement.ExecContext(ctx, serviceId, service.Name, service.Type, service.IntervalInSeconds, service.NextCheckTime, service.Endpoint, service.HttpMethod,
+		service.RequestTimeoutInSeconds, service.HttpHeaders, service.HttpBody, service.ExpectedHttpResponseBody,
+		service.ExpectedHttpStatusCode, service.FollowRedirects, service.VerifySsl, service.EnableNotifications,
+		service.NotifyAfterNumberOfFailures, time.Now()); err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteServiceById(ctx context.Context, serviceId string) error {
+	if _, err := deleteServiceByIdStatement.ExecContext(ctx, serviceId); err != nil {
+		return err
+	}
+	return nil
 }
