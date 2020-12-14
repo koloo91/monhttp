@@ -50,7 +50,7 @@
           </mat-form-field>
         </div>
 
-        <div class="input-row">
+        <div class="input-row" *ngIf="getServiceType() === 'ICMP_PING'">
           <p class="mat-subheading-1">Request Timeout</p>
           <mat-form-field appearance="outline">
             <mat-label>Request Timeout</mat-label>
@@ -68,7 +68,6 @@
       <mat-card-content>
         <div class="input-row">
           <p class="mat-subheading-1">Notify after failures</p>
-
             <mat-slide-toggle formControlName="enableNotifications"></mat-slide-toggle>
         </div>
 

@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {ServiceType} from '../../models/service.model';
 
 @Component({
   selector: 'app-create-service',
@@ -26,4 +27,11 @@ export class CreateServiceComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  getServiceType(): ServiceType {
+    if (!this.formGroup['type']) {
+      return 'HTTP';
+    }
+    console.log(this.formGroup['type'].value);
+    return this.formGroup['type'].value as ServiceType;
+  }
 }
