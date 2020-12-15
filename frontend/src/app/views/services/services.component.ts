@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ServiceService} from '../../services/service.service';
+import {Observable} from 'rxjs';
+import {Service} from '../../models/service.model';
 
 @Component({
   selector: 'app-services',
@@ -8,10 +10,15 @@ import {ServiceService} from '../../services/service.service';
 })
 export class ServicesComponent implements OnInit {
 
+  displayedColumns: string[] = ['name', 'status', 'visibility', 'failures', 'actions'];
+
+  dataSource$: Observable<Service[]>;
+
   constructor(private serviceService: ServiceService) {
   }
 
   ngOnInit(): void {
+    this.dataSource$ = this.serviceService.list();
     this.serviceService.list().subscribe(console.log, console.log);
   }
 

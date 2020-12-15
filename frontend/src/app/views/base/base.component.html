@@ -1,6 +1,16 @@
 <div id="base-component">
   <mat-toolbar color="primary">
-    monhttp
+    <mat-toolbar-row>
+      monhttp
+      <span class="menu-spacer"></span>
+      <div>
+        <a mat-button [routerLink]="'/'"> Dashboard </a>
+        <a mat-button [routerLink]="'/services'"> Services </a>
+        <a mat-button [routerLink]="'/settings'"> Settings </a>
+
+      </div>
+    </mat-toolbar-row>
+
   </mat-toolbar>
 
   <div class="content">
