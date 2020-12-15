@@ -34,8 +34,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repository.SetDatabase(db)
-
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.Fatal(err)
@@ -46,6 +44,8 @@ func main() {
 	}
 
 	m.Up()
+
+	repository.SetDatabase(db)
 
 	router := controller.SetupRoutes()
 

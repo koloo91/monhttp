@@ -1,4 +1,6 @@
 #create-service-component {
+  position: relative;
+
   mat-card {
     margin-top: 32px;
   }
@@ -8,11 +10,18 @@
     align-items: center;
 
     p {
-      flex-grow: 2;
+      width: 30%;
     }
 
     mat-form-field, mat-slider {
-      flex-grow: 8;
+      width: 70%;
     }
   }
+
+    .save-button {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+    }
+
 }
