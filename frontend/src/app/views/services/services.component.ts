@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ServiceService} from '../../services/service.service';
 import {Observable} from 'rxjs';
 import {Service} from '../../models/service.model';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-services',
@@ -14,7 +15,8 @@ export class ServicesComponent implements OnInit {
 
   dataSource$: Observable<Service[]>;
 
-  constructor(private serviceService: ServiceService) {
+  constructor(private serviceService: ServiceService,
+              private router: Router) {
   }
 
   ngOnInit(): void {
@@ -22,4 +24,7 @@ export class ServicesComponent implements OnInit {
     this.serviceService.list().subscribe(console.log, console.log);
   }
 
+  onCreateClick() {
+    this.router.navigate(['services', 'create']);
+  }
 }

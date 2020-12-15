@@ -1,4 +1,7 @@
 <div id="services-component">
+  <div class="create-button-container">
+    <button mat-raised-button color="primary" (click)="onCreateClick()">Create</button>
+  </div>
   <table mat-table [dataSource]="dataSource$" class="mat-elevation-z8">
     <!-- Name Column -->
     <ng-container matColumnDef="name">
