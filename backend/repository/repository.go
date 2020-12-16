@@ -9,3 +9,7 @@ func SetDatabase(database *sql.DB) {
 
 	prepareServiceStatements()
 }
+
+func BeginnTransaction() (*sql.Tx, error) {
+	return db.Begin()
+}

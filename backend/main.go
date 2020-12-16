@@ -8,6 +8,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/koloo91/monhttp/controller"
 	"github.com/koloo91/monhttp/repository"
+	"github.com/koloo91/monhttp/service"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -46,6 +47,7 @@ func main() {
 	m.Up()
 
 	repository.SetDatabase(db)
+	go service.StartScheduleJob()
 
 	router := controller.SetupRoutes()
 
