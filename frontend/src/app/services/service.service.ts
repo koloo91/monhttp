@@ -29,4 +29,26 @@ export class ServiceService extends BaseService {
         catchError(this.mapError)
       )
   }
+
+  get(id: string): Observable<Service> {
+    return this.http.get<Service>(`/api/services/${id}`)
+      .pipe(
+        catchError(this.mapError)
+      );
+  }
+
+  put(id: string, service: Service): Observable<Service> {
+    console.log(service);
+    return this.http.put<Service>(`/api/services/${id}`, service)
+      .pipe(
+        catchError(this.mapError)
+      )
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`/api/services/${id}`)
+      .pipe(
+        catchError(this.mapError)
+      );
+  }
 }

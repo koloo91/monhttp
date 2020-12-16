@@ -21,14 +21,18 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTableModule} from '@angular/material/table';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {ConfirmServiceDeleteDialogComponent} from './components/dialogs/confirm-service-delete-dialog/confirm-service-delete-dialog.component';
+import {MatDialogModule} from '@angular/material/dialog';
+import {EditServiceComponent} from './views/edit-service/edit-service.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ServicesComponent,
     CreateServiceComponent,
-    BaseComponent
+    BaseComponent,
+    ConfirmServiceDeleteDialogComponent,
+    EditServiceComponent
   ],
   imports: [
     BrowserModule,
@@ -47,7 +51,8 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatTableModule
+    MatTableModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

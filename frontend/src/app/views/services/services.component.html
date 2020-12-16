@@ -2,7 +2,7 @@
   <div class="create-button-container">
     <button mat-raised-button color="primary" (click)="onCreateClick()">Create</button>
   </div>
-  <table mat-table [dataSource]="dataSource$" class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource$" class="mat-elevation-z2">
     <!-- Name Column -->
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef> Name</th>
@@ -26,11 +26,11 @@
 
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Actions</th>
-      <td mat-cell *matCellDef="let element">
+      <td mat-cell *matCellDef="let element" (click)="onEditClick(element.id)">
         <button mat-icon-button>
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button class="delete-button">
+        <button mat-icon-button class="delete-button" (click)="onDeleteClick(element)">
           <mat-icon>delete</mat-icon>
         </button>
       </td>

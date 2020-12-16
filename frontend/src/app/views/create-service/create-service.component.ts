@@ -18,10 +18,10 @@ export class CreateServiceComponent implements OnInit, OnDestroy {
   formGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
     type: new FormControl('HTTP', [Validators.required]),
-    checkIntervalInSeconds: new FormControl(30, [Validators.required, Validators.min(30), Validators.max(1800)]),
+    intervalInSeconds: new FormControl(30, [Validators.required, Validators.min(30), Validators.max(1800)]),
 
     endpoint: new FormControl('', [Validators.required]),
-    requestTimeoutInSeconds: new FormControl(1, [Validators.min(1), Validators.max(180)]),
+    requestTimeoutInSeconds: new FormControl(10, [Validators.min(1), Validators.max(180)]),
     httpMethod: new FormControl('GET'),
     httpBody: new FormControl(''),
     httpHeaders: new FormControl(''),
