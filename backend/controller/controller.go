@@ -18,6 +18,10 @@ func SetupRoutes() *gin.Engine {
 		apiGroup.DELETE("/services/:id", deleteService)
 	}
 
+	{
+		apiGroup.GET("/services/:id/checks", getChecks)
+	}
+
 	return router
 }
 

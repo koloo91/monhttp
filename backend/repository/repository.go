@@ -8,6 +8,7 @@ func SetDatabase(database *sql.DB) {
 	db = database
 
 	prepareServiceStatements()
+	prepareCheckStatements()
 }
 
 func BeginnTransaction() (*sql.Tx, error) {

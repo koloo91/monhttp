@@ -48,5 +48,9 @@ func MapCheckEntityToVo(entity Check) CheckVo {
 func MapCheckEntitiesToVos(entities []Check) []CheckVo {
 	result := make([]CheckVo, 0, len(entities))
 
+	for _, entity := range entities {
+		result = append(result, MapCheckEntityToVo(entity))
+	}
+
 	return result
 }
