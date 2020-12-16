@@ -24,6 +24,8 @@ import {MatTableModule} from '@angular/material/table';
 import {ConfirmServiceDeleteDialogComponent} from './components/dialogs/confirm-service-delete-dialog/confirm-service-delete-dialog.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {EditServiceComponent} from './views/edit-service/edit-service.component';
+import { DashboardComponent } from './views/dashboard/dashboard.component';
+import { ServiceCardComponent } from './components/service-card/service-card.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import {EditServiceComponent} from './views/edit-service/edit-service.component'
     CreateServiceComponent,
     BaseComponent,
     ConfirmServiceDeleteDialogComponent,
-    EditServiceComponent
+    EditServiceComponent,
+    DashboardComponent,
+    ServiceCardComponent
   ],
   imports: [
     BrowserModule,

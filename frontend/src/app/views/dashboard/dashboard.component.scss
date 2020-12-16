@@ -1,0 +1,10 @@
+#dashboard-component {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+
+  .service-card {
+    width: 25%;
+    margin: 8px;
+  }
+}

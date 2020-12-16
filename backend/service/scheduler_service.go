@@ -152,14 +152,14 @@ func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure,
 		reason := fmt.Sprintf("Expected status code '%d' but got '%d'", service.ExpectedHttpStatusCode, response.StatusCode)
 		failure := model.NewFailure(service.Id, reason)
 
-		check := model.NewCheck(service.Id, 0, 0, true)
+		check := model.NewCheck(service.Id, 0, true)
 		return check, failure, nil
 	}
 
 	// TODO: check body
 
 	latency := time.Since(start)
-	return model.NewCheck(service.Id, latency.Milliseconds(), 0, false), nil, nil
+	return model.NewCheck(service.Id, latency.Milliseconds(), false), nil, nil
 }
 
 func handleIcmpPingServiceType(service model.Service) (*model.Check, *model.Failure, error) {
@@ -189,12 +189,12 @@ func handleIcmpPingServiceType(service model.Service) (*model.Check, *model.Fail
 	strs := r.FindStringSubmatch(outputString)
 	if len(strs) < 2 {
 		failure := model.NewFailure(service.Id, "could not parse ping duration")
-		check := model.NewCheck(service.Id, 0, 0, true)
+		check := model.NewCheck(service.Id, 0, true)
 		return check, failure, nil
 	}
 
 	duration, _ := strconv.ParseInt(strs[1], 10, 64)
-	check := model.NewCheck(service.Id, 0, duration, false)
+	check := model.NewCheck(service.Id, duration, false)
 
 	return check, nil, nil
 }

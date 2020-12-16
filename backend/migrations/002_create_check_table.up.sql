@@ -6,7 +6,6 @@ create table "check"
             references service
             on delete cascade,
     latency_in_ms   int,
-    ping_time_in_ms int,
     is_failure      bool,
     created_at      timestamptz not null
 );

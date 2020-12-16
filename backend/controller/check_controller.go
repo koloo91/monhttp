@@ -39,3 +39,16 @@ func getChecks(ctx *gin.Context) {
 	checkVos := model.MapCheckEntitiesToVos(checks)
 	ctx.JSON(http.StatusOK, model.CheckWrapperVo{Data: checkVos})
 }
+
+func getAverage(ctx *gin.Context) {
+	serviceId := ctx.Param("id")
+
+	average, err := service.GetAverageValues(ctx.Request.Context(), serviceId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	averageVo := model.MapAverageEntityToVo(average)
+	ctx.JSON(http.StatusOK, averageVo)
+}
