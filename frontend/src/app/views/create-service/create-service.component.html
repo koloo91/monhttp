@@ -1,0 +1,149 @@
+<div id="create-service-component">
+  <form [formGroup]="formGroup">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Service Info</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="input-row">
+          <p class="mat-subheading-1">Service Name</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Service Name</mat-label>
+            <input matInput placeholder="Service Name" formControlName="name" required>
+          </mat-form-field>
+        </div>
+
+        <div class="input-row">
+          <p class="mat-subheading-1">Service Type</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Service Type</mat-label>
+            <mat-select formControlName="type" required>
+              <mat-option value="HTTP">HTTP</mat-option>
+              <mat-option value="ICMP_PING">ICMP Ping</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="input-row">
+          <p class="mat-subheading-1">Check Interval</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Check Interval</mat-label>
+            <input matInput type="number" min="30" max="1800" placeholder="Service Name"
+                   formControlName="intervalInSeconds" required>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Request Details</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="input-row">
+          <p class="mat-subheading-1">Service Endpoint</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Service Endpoint</mat-label>
+            <input matInput placeholder="Service Endpoint"
+                   formControlName="endpoint" required>
+          </mat-form-field>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">HTTP Method</p>
+          <mat-form-field appearance="outline">
+            <mat-label>HTTP Method</mat-label>
+            <mat-select formControlName="httpMethod">
+              <mat-option value="GET">GET</mat-option>
+              <mat-option value="POST">POST</mat-option>
+              <mat-option value="PATCH">PATCH</mat-option>
+              <mat-option value="PUT">PUT</mat-option>
+              <mat-option value="DELETE">DELETE</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="input-row">
+          <p class="mat-subheading-1">Request Timeout</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Request Timeout</mat-label>
+            <input matInput type="number" min="1" max="180" placeholder="Request Timeout"
+                   formControlName="requestTimeoutInSeconds">
+          </mat-form-field>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">HTTP Body</p>
+          <mat-form-field appearance="outline">
+            <mat-label>HTTP Body</mat-label>
+            <input matInput placeholder="HTTP Body"
+                   formControlName="httpBody">
+          </mat-form-field>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">HTTP Headers</p>
+          <mat-form-field appearance="outline">
+            <mat-label>HTTP Headers</mat-label>
+            <input matInput placeholder="Content-Type:application/json;Authorization:Foo"
+                   formControlName="httpHeaders">
+          </mat-form-field>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">Expected response body</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Expected response body</mat-label>
+            <input matInput placeholder="Expected response body"
+                   formControlName="expectedHttpResponseBody">
+          </mat-form-field>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">Expected response status code</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Expected response status code</mat-label>
+            <input matInput type="number" placeholder="Expected response status code"
+                   formControlName="expectedHttpStatusCode">
+          </mat-form-field>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">Follow redirects</p>
+          <mat-slide-toggle formControlName="followRedirects"></mat-slide-toggle>
+        </div>
+
+        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
+          <p class="mat-subheading-1">Verify SSL</p>
+          <mat-slide-toggle formControlName="verifySsl"></mat-slide-toggle>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Notification Options</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="input-row">
+          <p class="mat-subheading-1">Notify after failures</p>
+          <mat-slide-toggle formControlName="enableNotifications"></mat-slide-toggle>
+        </div>
+
+        <div class="input-row">
+          <p class="mat-subheading-1">Notify after failures</p>
+          <mat-form-field appearance="outline">
+            <mat-label>Notify after failures</mat-label>
+            <input matInput type="number" min="1" max="180" placeholder="Notify after failures"
+                   formControlName="notifyAfterNumberOfFailures">
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+
+  <button mat-fab class="save-button" (click)="saveService()" [disabled]="!formGroup.valid || isLoading">
+    <mat-icon>save</mat-icon>
+  </button>
+</div>
