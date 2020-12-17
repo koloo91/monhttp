@@ -1,13 +1,20 @@
-<div>
+<div class="service-card-component">
   <mat-card>
     <mat-card-header>
       <mat-card-title>{{service.name}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div *ngIf="average$ | async as average">
-        <div>Last 24h: {{average.lastDay}} ms</div>
-        <div>Last week: {{average.lastWeek}} ms</div>
+      <div *ngIf="average$ | async as average" class="latency-values">
+        <div>
+          <div><b>{{average.lastDay}} ms</b></div>
+          <div class="mat-small">Latency last 24h</div>
+        </div>
+        <div>
+          <div><b>{{average.lastWeek}} ms</b></div>
+          <div class="mat-small">Latency last week</div>
+        </div>
       </div>
+      <mat-divider></mat-divider>
     </mat-card-content>
   </mat-card>
 </div>

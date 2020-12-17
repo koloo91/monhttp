@@ -26,6 +26,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {EditServiceComponent} from './views/edit-service/edit-service.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { ServiceCardComponent } from './components/service-card/service-card.component';
+import {MatDividerModule} from '@angular/material/divider';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { ServiceCardComponent } from './components/service-card/service-card.com
     MatIconModule,
     MatSnackBarModule,
     MatTableModule,
-    MatDialogModule
+    MatDialogModule,
+    MatDividerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

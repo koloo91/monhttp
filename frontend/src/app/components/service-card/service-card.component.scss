@@ -1,0 +1,11 @@
+.service-card-component {
+  width: 100%;
+
+  .latency-values {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+}
