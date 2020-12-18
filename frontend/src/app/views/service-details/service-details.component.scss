@@ -1,12 +1,7 @@
 #service-details-component {
-  //height: 100%;
 
   mat-card {
     margin-top: 32px;
-  }
-
-  .time-range-container {
-
   }
 
   .time-range-form {
@@ -17,5 +12,8 @@
   .chart-container {
     width: 100%;
     height: 500px;
+  }
+  .failures-table {
+    width: 100%;
   }
 }

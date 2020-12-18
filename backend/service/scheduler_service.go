@@ -144,7 +144,7 @@ func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure,
 	start := time.Now()
 	response, err := client.Do(request)
 	if err != nil {
-		return nil, nil, err
+		return nil, model.NewFailure(service.Id, err.Error()), nil
 	}
 	defer response.Body.Close()
 

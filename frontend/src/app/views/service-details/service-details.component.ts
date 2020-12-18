@@ -7,6 +7,9 @@ import {map, switchMap} from 'rxjs/operators';
 import {combineLatest, Observable} from 'rxjs';
 import {Service} from '../../models/service.model';
 import {FormControl, FormGroup} from '@angular/forms';
+import {FailureService} from '../../services/failure.service';
+import {Failure} from '../../models/failure.model';
+import {Check} from '../../models/check.model';
 
 @Component({
   selector: 'app-service-details',
@@ -15,6 +18,8 @@ import {FormControl, FormGroup} from '@angular/forms';
 })
 export class ServiceDetailsComponent implements OnInit {
 
+  displayedColumns: string[] = ['reason', 'date'];
+
 
   dateTimeRangeFormGroup = new FormGroup({
     fromDateTime: new FormControl(new Date()),
@@ -22,11 +27,14 @@ export class ServiceDetailsComponent implements OnInit {
   });
 
   service$: Observable<Service>;
+  checks$: Observable<Check[]>;
+  failures: Failure[];
 
-  chartData: any = [];
+  chartData: any;
 
   constructor(private serviceService: ServiceService,
               private checkService: CheckService,
+              private failureService: FailureService,
               private errorService: ErrorService,
               private route: ActivatedRoute) {
   }
@@ -41,26 +49,17 @@ export class ServiceDetailsComponent implements OnInit {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const now = new Date();
-
-    // this.route.params
-    //   .pipe(
-    //     map(params => params['id'] as string),
-    //     switchMap(id => this.checkService.list(id, yesterday.toISOString(), now.toISOString()))
-    //   ).subscribe(checks => {
-    //   this.chartData = [{
-    //     name: 'Latency in ms', series: checks.map(check => {
-    //       return {name: new Date(check.createdAt).toLocaleString(), value: check.latencyInMs};
-    //     })
-    //   }]
-    // });
     this.loadChartData();
-    this.dateTimeRangeFormGroup.get('fromDateTime').setValue(yesterday);
+    combineLatest([this.route.params, this.dateTimeRangeFormGroup.valueChanges])
+      .pipe(
+        map(([params, formValues]) => [params['id'], formValues]),
+        switchMap(([id, {
+          fromDateTime,
+          toDateTime
+        }]) => this.failureService.list(id, fromDateTime.toISOString(), toDateTime.toISOString()))
+      ).subscribe(data => this.failures = data, console.log);
 
-    this.dateTimeRangeFormGroup.valueChanges.subscribe(({fromDateTime, toDateTime}) => {
-      console.log(fromDateTime);
-      console.log(toDateTime);
-    });
+    this.dateTimeRangeFormGroup.get('fromDateTime').setValue(yesterday);
   }
 
   loadChartData() {
@@ -71,7 +70,7 @@ export class ServiceDetailsComponent implements OnInit {
           fromDateTime,
           toDateTime
         }]) => this.checkService.list(id, fromDateTime.toISOString(), toDateTime.toISOString())),
-        map(checks => checks.reverse())
+        map(checks => checks.reverse()),
       ).subscribe(checks => {
       this.chartData = [{
         name: 'Latency in ms', series: checks.map(check => {
