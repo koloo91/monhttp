@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func GetChecks(ctx context.Context, serviceId string, from time.Time, to time.Time) ([]model.Check, error) {
+func GetChecks(ctx context.Context, serviceId string, from, to time.Time) ([]model.Check, error) {
 	return repository.SelectChecks(ctx, serviceId, from, to)
 }
 

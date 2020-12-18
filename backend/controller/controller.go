@@ -23,6 +23,10 @@ func SetupRoutes() *gin.Engine {
 		apiGroup.GET("/services/:id/average", getAverage)
 	}
 
+	{
+		apiGroup.GET("/services/:id/failures", getFailures)
+	}
+
 	return router
 }
 

@@ -45,7 +45,7 @@ func InsertCheck(ctx context.Context, tx *sql.Tx, check model.Check) error {
 	return nil
 }
 
-func SelectChecks(ctx context.Context, serviceId string, from time.Time, to time.Time) ([]model.Check, error) {
+func SelectChecks(ctx context.Context, serviceId string, from, to time.Time) ([]model.Check, error) {
 	rows, err := selectChecksByServiceIdAndCreatedAtStatement.QueryContext(ctx, serviceId, from, to)
 	if err != nil {
 		return nil, err
