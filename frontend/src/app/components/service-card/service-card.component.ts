@@ -1,9 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Service} from '../../models/service.model';
 import {CheckService} from '../../services/check.service';
 import {Observable} from 'rxjs';
 import {Average} from '../../models/average.model';
-import {ChartComponent} from 'ng-apexcharts';
 
 @Component({
   selector: 'app-service-card',
@@ -20,8 +19,7 @@ export class ServiceCardComponent implements OnInit {
 
   average$: Observable<Average>;
 
-  @ViewChild('chart') chart: ChartComponent;
-  public chartOptions: Partial<any>;
+  chartData: any = [];
 
   constructor(private checkService: CheckService) {
   }
@@ -32,40 +30,15 @@ export class ServiceCardComponent implements OnInit {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    this.chartOptions = {
-      series: [
-        {
-          name: 'My-series',
-          data: []
-        }
-      ],
-      chart: {
-        height: 'auto',
-        type: 'area'
-      },
-      title: {
-        text: ''
-      },
-      yaxis: {
-        labels: {
-          formatter: function (val) {
-            return (val / 10000).toFixed();
-          }
-        }
-      },
-      xaxis: {
-        type: 'datetime'
-      }
-    };
 
     this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString())
       .subscribe(data => {
-        this.chartOptions.series = [
-          {
-            name: 'My-series',
-            data: data.map(check => [new Date(check.createdAt).getTime(), check.latencyInMs])
-          }
-        ];
+        this.chartData = [{
+          name: 'Latency in ms',
+          series: data.map(check => {
+            return {name: new Date(check.createdAt).toLocaleTimeString(), value: check.latencyInMs};
+          })
+        }]
 
       }, console.log)
 

@@ -15,13 +15,17 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div>
-        <apx-chart
-          [series]="chartOptions.series"
-          [chart]="chartOptions.chart"
-          [xaxis]="chartOptions.xaxis"
-          [title]="chartOptions.title"
-        ></apx-chart>
+      <div style="height: 200px">
+        <ngx-charts-line-chart
+          style="width: 100%"
+          [xAxis]="false"
+          [yAxis]="true"
+          [showXAxisLabel]="false"
+          [showYAxisLabel]="false"
+          [autoScale]="true"
+          [legend]="false"
+          [results]="chartData">
+        </ngx-charts-line-chart>
       </div>
     </mat-card-content>
   </mat-card>

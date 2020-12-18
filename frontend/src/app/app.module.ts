@@ -24,11 +24,11 @@ import {MatTableModule} from '@angular/material/table';
 import {ConfirmServiceDeleteDialogComponent} from './components/dialogs/confirm-service-delete-dialog/confirm-service-delete-dialog.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {EditServiceComponent} from './views/edit-service/edit-service.component';
-import { DashboardComponent } from './views/dashboard/dashboard.component';
-import { ServiceCardComponent } from './components/service-card/service-card.component';
+import {DashboardComponent} from './views/dashboard/dashboard.component';
+import {ServiceCardComponent} from './components/service-card/service-card.component';
 import {MatDividerModule} from '@angular/material/divider';
-import {NgApexchartsModule} from 'ng-apexcharts';
-import { ServiceDetailsComponent } from './views/service-details/service-details.component';
+import {ServiceDetailsComponent} from './views/service-details/service-details.component';
+import {NgxChartsModule} from '@swimlane/ngx-charts';
 
 @NgModule({
   declarations: [
@@ -62,7 +62,7 @@ import { ServiceDetailsComponent } from './views/service-details/service-details
     MatTableModule,
     MatDialogModule,
     MatDividerModule,
-    NgApexchartsModule
+    NgxChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
