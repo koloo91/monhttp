@@ -26,6 +26,8 @@ export class ServiceCardComponent implements OnInit {
   checks: Check[] = [];
   chartData: any = [];
 
+  cardWidth: number;
+
   constructor(private checkService: CheckService) {
   }
 

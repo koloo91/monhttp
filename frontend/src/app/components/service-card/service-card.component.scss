@@ -2,11 +2,10 @@
 .service-card-component {
   width: 100%;
 
-
   mat-card-title {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .latency-values {
