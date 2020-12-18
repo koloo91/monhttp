@@ -24,6 +24,13 @@ import {MatTableModule} from '@angular/material/table';
 import {ConfirmServiceDeleteDialogComponent} from './components/dialogs/confirm-service-delete-dialog/confirm-service-delete-dialog.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {EditServiceComponent} from './views/edit-service/edit-service.component';
+import {DashboardComponent} from './views/dashboard/dashboard.component';
+import {ServiceCardComponent} from './components/service-card/service-card.component';
+import {MatDividerModule} from '@angular/material/divider';
+import {ServiceDetailsComponent} from './views/service-details/service-details.component';
+import {NgxChartsModule} from '@swimlane/ngx-charts';
+import {NgxMatDatetimePickerModule, NgxMatNativeDateModule} from '@angular-material-components/datetime-picker';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
@@ -32,7 +39,10 @@ import {EditServiceComponent} from './views/edit-service/edit-service.component'
     CreateServiceComponent,
     BaseComponent,
     ConfirmServiceDeleteDialogComponent,
-    EditServiceComponent
+    EditServiceComponent,
+    DashboardComponent,
+    ServiceCardComponent,
+    ServiceDetailsComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +62,12 @@ import {EditServiceComponent} from './views/edit-service/edit-service.component'
     MatIconModule,
     MatSnackBarModule,
     MatTableModule,
-    MatDialogModule
+    MatDialogModule,
+    MatDividerModule,
+    NgxChartsModule,
+    NgxMatDatetimePickerModule,
+    MatDatepickerModule,
+    NgxMatNativeDateModule
   ],
   providers: [],
   bootstrap: [AppComponent]

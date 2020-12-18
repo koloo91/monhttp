@@ -1,0 +1,35 @@
+<div class="service-card-component">
+  <mat-card>
+    <mat-card-header (click)="onCardClicked()">
+      <mat-card-title>{{service.name}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="average$ | async as average" class="latency-values" (click)="onCardClicked()">
+        <div>
+          <div><b>{{average.lastDay}} ms</b></div>
+          <div class="mat-small">Latency last 24h</div>
+        </div>
+        <div>
+          <div><b>{{average.lastWeek}} ms</b></div>
+          <div class="mat-small">Latency last week</div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="chart-container">
+        <ngx-charts-line-chart
+          *ngIf="checks.length !== 0"
+          [xAxis]="false"
+          [yAxis]="true"
+          [showXAxisLabel]="false"
+          [showYAxisLabel]="false"
+          [autoScale]="true"
+          [legend]="false"
+          [results]="chartData">
+        </ngx-charts-line-chart>
+        <div *ngIf="checks.length === 0" class="no-entries-found">
+          <div>No entries found</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

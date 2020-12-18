@@ -8,4 +8,10 @@ func SetDatabase(database *sql.DB) {
 	db = database
 
 	prepareServiceStatements()
+	prepareCheckStatements()
+	prepareFailureStatements()
+}
+
+func BeginnTransaction() (*sql.Tx, error) {
+	return db.Begin()
 }

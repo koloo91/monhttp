@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	insertServiceStatement     *sql.Stmt
-	selectServicesStatement    *sql.Stmt
-	selectServiceByIdStatement *sql.Stmt
-	updateServiceByIdStatement *sql.Stmt
-	deleteServiceByIdStatement *sql.Stmt
+	insertServiceStatement            *sql.Stmt
+	selectServicesStatement           *sql.Stmt
+	selectServiceByIdStatement        *sql.Stmt
+	updateServiceByIdStatement        *sql.Stmt
+	deleteServiceByIdStatement        *sql.Stmt
+	getNextScheduledServicesStatement *sql.Stmt
 )
 
 func prepareServiceStatements() {
@@ -46,7 +47,7 @@ func prepareServiceStatements() {
 															   notify_after_number_of_failures,
 															   created_at,
 															   updated_at
-														FROM service;`)
+														FROM service ORDER BY name;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -102,6 +103,8 @@ func prepareServiceStatements() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	getNextScheduledServicesStatement, err = db.Prepare(`SELECT id FROM service WHERE next_check_time <= now();`)
 }
 
 func InsertService(ctx context.Context, service model.Service) error {
@@ -204,6 +207,63 @@ func SelectServiceById(ctx context.Context, serviceId string) (model.Service, er
 	}, nil
 }
 
+func SelectServiceByIdLocked(ctx context.Context, tx *sql.Tx, serviceId string) (model.Service, error) {
+	row := tx.QueryRowContext(ctx, `SELECT id,
+												   name,
+												   type,
+												   interval_in_seconds,
+												   next_check_time,
+												   endpoint,
+												   http_method,
+												   request_timeout_in_seconds,
+												   http_headers,
+												   http_body,
+												   expected_http_response_body,
+												   expected_http_status_code,
+												   follow_redirects,
+												   verify_ssl,
+												   enable_notifications,
+												   notify_after_number_of_failures,
+												   created_at,
+												   updated_at
+											FROM service WHERE id = $1 
+											FOR UPDATE;`, serviceId)
+
+	var id, name, endpoint, httpMethod, httpHeaders, httpBody, expectedHttpResponseBody string
+	var serviceType model.ServiceType
+	var intervalInSeconds, requestTimeoutInSeconds, expectedHttpStatusCode, notifyAfterNumberOfFailures int
+	var followRedirects, verifySsl, enableNotifications bool
+	var nextCheckTime, createdAt, updatedAt time.Time
+
+	if err := row.Scan(&id, &name, &serviceType, &intervalInSeconds, &nextCheckTime, &endpoint, &httpMethod,
+		&requestTimeoutInSeconds, &httpHeaders, &httpBody, &expectedHttpResponseBody,
+		&expectedHttpStatusCode, &followRedirects, &verifySsl, &enableNotifications,
+		&notifyAfterNumberOfFailures, &createdAt, &updatedAt); err != nil {
+		return model.Service{}, err
+	}
+
+	return model.Service{
+		Id:                          id,
+		Name:                        name,
+		Type:                        serviceType,
+		IntervalInSeconds:           intervalInSeconds,
+		NextCheckTime:               nextCheckTime,
+		Endpoint:                    endpoint,
+		HttpMethod:                  httpMethod,
+		RequestTimeoutInSeconds:     requestTimeoutInSeconds,
+		HttpHeaders:                 httpHeaders,
+		HttpBody:                    httpBody,
+		ExpectedHttpResponseBody:    expectedHttpResponseBody,
+		ExpectedHttpStatusCode:      expectedHttpStatusCode,
+		FollowRedirects:             followRedirects,
+		VerifySsl:                   verifySsl,
+		EnableNotifications:         enableNotifications,
+		NotifyAfterNumberOfFailures: notifyAfterNumberOfFailures,
+		CreatedAt:                   createdAt,
+		UpdatedAt:                   updatedAt,
+	}, nil
+}
+
 func UpdateServiceById(ctx context.Context, serviceId string, service model.Service) error {
 	if _, err := updateServiceByIdStatement.ExecContext(ctx, serviceId, service.Name, service.Type, service.IntervalInSeconds, service.NextCheckTime, service.Endpoint, service.HttpMethod,
 		service.RequestTimeoutInSeconds, service.HttpHeaders, service.HttpBody, service.ExpectedHttpResponseBody,
@@ -214,9 +274,39 @@ func UpdateServiceById(ctx context.Context, serviceId string, service model.Serv
 	return nil
 }
 
+func UpdateServiceByIdNextCheckTime(ctx context.Context, tx *sql.Tx, serviceId string, nextCheckTime time.Time) error {
+	if _, err := tx.ExecContext(ctx, `UPDATE service SET next_check_time = $2 WHERE id = $1;`,
+		serviceId, nextCheckTime); err != nil {
+		return err
+	}
+	return nil
+}
+
 func DeleteServiceById(ctx context.Context, serviceId string) error {
 	if _, err := deleteServiceByIdStatement.ExecContext(ctx, serviceId); err != nil {
 		return err
 	}
 	return nil
+}
+
+func GetNextScheduledServiceIds(ctx context.Context) ([]string, error) {
+	rows, err := getNextScheduledServicesStatement.QueryContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var id string
+
+	result := make([]string, 0)
+
+	for rows.Next() {
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+
+		result = append(result, id)
+	}
+
+	return result, nil
 }
