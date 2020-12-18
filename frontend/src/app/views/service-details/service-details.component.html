@@ -1,10 +1,20 @@
-<div>
+<div id="service-details-component">
   <mat-card *ngIf="service$ | async as service">
     <mat-card-header>
       <mat-card-title>{{service.name}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div></div>
+      <div class="chart-container">
+        <ngx-charts-line-chart
+          [xAxis]="true"
+          [yAxis]="true"
+          [yAxisLabel]="'Latency in ms'"
+          [showYAxisLabel]="true"
+          [autoScale]="true"
+          [trimXAxisTicks]="false"
+          [results]="chartData">
+        </ngx-charts-line-chart>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

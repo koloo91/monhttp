@@ -16,6 +16,8 @@ export class ServiceDetailsComponent implements OnInit {
 
   service$: Observable<Service>;
 
+  chartData: any = [];
+
   constructor(private serviceService: ServiceService,
               private checkService: CheckService,
               private errorService: ErrorService,
@@ -27,7 +29,23 @@ export class ServiceDetailsComponent implements OnInit {
       .pipe(
         map(params => params['id'] as string),
         switchMap(id => this.serviceService.get(id))
-      )
-  }
+      );
 
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const now = new Date();
+
+    this.route.params
+      .pipe(
+        map(params => params['id'] as string),
+        switchMap(id => this.checkService.list(id, yesterday.toISOString(), now.toISOString()))
+      ).subscribe(checks => {
+      this.chartData = [{
+        name: 'Latency in ms', series: checks.map(check => {
+          return {name: new Date(check.createdAt).toLocaleString(), value: check.latencyInMs};
+        })
+      }]
+    });
+  }
 }
