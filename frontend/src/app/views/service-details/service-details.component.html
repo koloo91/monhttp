@@ -41,7 +41,7 @@
       <mat-card-title>Service latency</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="chart-container">
+      <div class="chart-container" *ngIf="checks.length !== 0">
         <ngx-charts-line-chart
           [xAxis]="true"
           [yAxis]="true"
@@ -52,6 +52,9 @@
           [results]="chartData">
         </ngx-charts-line-chart>
       </div>
+      <div *ngIf="checks.length === 0" class="no-entries-found">
+        <div>No entries found for this timeframe</div>
+      </div>
     </mat-card-content>
   </mat-card>
 
@@ -60,13 +63,12 @@
       <mat-card-title>Failures</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <table mat-table [dataSource]="failures" class="failures-table">
+      <table mat-table [dataSource]="failures" class="failures-table" *ngIf="failures.length !== 0">
         <ng-container matColumnDef="reason">
           <th mat-header-cell *matHeaderCellDef> Reason</th>
           <td mat-cell *matCellDef="let element"> {{element.reason}} </td>
         </ng-container>
 
-        <!-- Weight Column -->
         <ng-container matColumnDef="date">
           <th mat-header-cell *matHeaderCellDef> Date</th>
           <td mat-cell *matCellDef="let element"> {{element.createdAt | date: 'medium'}} </td>
@@ -75,6 +77,10 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+
+      <div *ngIf="failures.length === 0" class="no-entries-found">
+        <div>No entries found for this timeframe</div>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

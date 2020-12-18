@@ -27,8 +27,8 @@ export class ServiceDetailsComponent implements OnInit {
   });
 
   service$: Observable<Service>;
-  checks$: Observable<Check[]>;
-  failures: Failure[];
+  checks: Check[] = [];
+  failures: Failure[] = [];
 
   chartData: any;
 
@@ -57,7 +57,8 @@ export class ServiceDetailsComponent implements OnInit {
           fromDateTime,
           toDateTime
         }]) => this.failureService.list(id, fromDateTime.toISOString(), toDateTime.toISOString()))
-      ).subscribe(data => this.failures = data, console.log);
+      )
+      .subscribe(data => this.failures = data, console.log);
 
     this.dateTimeRangeFormGroup.get('fromDateTime').setValue(yesterday);
   }
@@ -71,12 +72,14 @@ export class ServiceDetailsComponent implements OnInit {
           toDateTime
         }]) => this.checkService.list(id, fromDateTime.toISOString(), toDateTime.toISOString())),
         map(checks => checks.reverse()),
-      ).subscribe(checks => {
-      this.chartData = [{
-        name: 'Latency in ms', series: checks.map(check => {
-          return {name: new Date(check.createdAt).toLocaleString(), value: check.latencyInMs};
-        })
-      }]
-    });
+      )
+      .subscribe(checks => {
+        this.checks = checks;
+        this.chartData = [{
+          name: 'Latency in ms', series: checks.map(check => {
+            return {name: new Date(check.createdAt).toLocaleString(), value: check.latencyInMs};
+          })
+        }]
+      });
   }
 }
