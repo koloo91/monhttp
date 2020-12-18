@@ -15,9 +15,9 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div style="height: 200px">
+      <div class="chart-container">
         <ngx-charts-line-chart
-          style="width: 100%"
+          *ngIf="checks.length !== 0"
           [xAxis]="false"
           [yAxis]="true"
           [showXAxisLabel]="false"
@@ -26,6 +26,9 @@
           [legend]="false"
           [results]="chartData">
         </ngx-charts-line-chart>
+        <div *ngIf="checks.length === 0" class="no-entries-found">
+          <div>No entries found</div>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

@@ -4,6 +4,7 @@ import {CheckService} from '../../services/check.service';
 import {Observable} from 'rxjs';
 import {Average} from '../../models/average.model';
 import {map} from 'rxjs/operators';
+import {Check} from '../../models/check.model';
 
 @Component({
   selector: 'app-service-card',
@@ -20,6 +21,7 @@ export class ServiceCardComponent implements OnInit {
 
   average$: Observable<Average>;
 
+  checks: Check[] = [];
   chartData: any = [];
 
   constructor(private checkService: CheckService) {
@@ -36,10 +38,11 @@ export class ServiceCardComponent implements OnInit {
       .pipe(
         map(checks => checks.reverse())
       )
-      .subscribe(data => {
+      .subscribe(checks => {
+        this.checks = checks;
         this.chartData = [{
           name: 'Latency in ms',
-          series: data.map(check => {
+          series: checks.map(check => {
             return {name: new Date(check.createdAt).toLocaleTimeString(), value: check.latencyInMs};
           })
         }]

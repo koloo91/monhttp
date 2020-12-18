@@ -26,7 +26,7 @@ func prepareCheckStatements() {
 		log.Fatal(err)
 	}
 
-	selectAverageLatencyStatement, err = db.Prepare(`SELECT ROUND(AVG(latency_in_ms))
+	selectAverageLatencyStatement, err = db.Prepare(`SELECT COALESCE(ROUND(AVG(latency_in_ms)), 0)
 															FROM "check"
 															WHERE service_id = $1
 															  AND created_at >= $2

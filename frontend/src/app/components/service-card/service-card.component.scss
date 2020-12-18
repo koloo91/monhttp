@@ -16,4 +16,17 @@
   .latency-values:hover {
     cursor: pointer;
   }
+
+  .chart-container {
+    height: 200px;
+
+    .no-entries-found {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      text-align: center;
+    }
+  }
 }
