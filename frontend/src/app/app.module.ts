@@ -29,6 +29,8 @@ import {ServiceCardComponent} from './components/service-card/service-card.compo
 import {MatDividerModule} from '@angular/material/divider';
 import {ServiceDetailsComponent} from './views/service-details/service-details.component';
 import {NgxChartsModule} from '@swimlane/ngx-charts';
+import {NgxMatDatetimePickerModule, NgxMatNativeDateModule} from '@angular-material-components/datetime-picker';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
@@ -62,7 +64,10 @@ import {NgxChartsModule} from '@swimlane/ngx-charts';
     MatTableModule,
     MatDialogModule,
     MatDividerModule,
-    NgxChartsModule
+    NgxChartsModule,
+    NgxMatDatetimePickerModule,
+    MatDatepickerModule,
+    NgxMatNativeDateModule
   ],
   providers: [],
   bootstrap: [AppComponent]

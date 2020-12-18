@@ -3,6 +3,7 @@ import {Service} from '../../models/service.model';
 import {CheckService} from '../../services/check.service';
 import {Observable} from 'rxjs';
 import {Average} from '../../models/average.model';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-service-card',
@@ -32,6 +33,9 @@ export class ServiceCardComponent implements OnInit {
 
 
     this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString())
+      .pipe(
+        map(checks => checks.reverse())
+      )
       .subscribe(data => {
         this.chartData = [{
           name: 'Latency in ms',

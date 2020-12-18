@@ -4,6 +4,43 @@
       <mat-card-title>{{service.name}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
+      1234 ms
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Timeframe</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <div class="time-range-container">
+        <form [formGroup]="dateTimeRangeFormGroup" class="time-range-form">
+          <mat-form-field appearance="outline">
+            <input matInput [ngxMatDatetimePicker]="fromPicker"
+                   placeholder="Choose a date" formControlName="fromDateTime">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #fromPicker >
+            </ngx-mat-datetime-picker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <input matInput [ngxMatDatetimePicker]="toPicker"
+                   placeholder="Choose a date" formControlName="toDateTime">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #toPicker>
+            </ngx-mat-datetime-picker>
+          </mat-form-field>
+        </form>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Service latency</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
       <div class="chart-container">
         <ngx-charts-line-chart
           [xAxis]="true"
@@ -16,5 +53,11 @@
         </ngx-charts-line-chart>
       </div>
     </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Failures</mat-card-title>
+    </mat-card-header>
   </mat-card>
 </div>
