@@ -5,6 +5,7 @@ import {CreateServiceComponent} from './views/create-service/create-service.comp
 import {BaseComponent} from './views/base/base.component';
 import {EditServiceComponent} from './views/edit-service/edit-service.component';
 import {DashboardComponent} from './views/dashboard/dashboard.component';
+import {ServiceDetailsComponent} from './views/service-details/service-details.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,10 @@ const routes: Routes = [
       {
         path: 'services/edit/:id',
         component: EditServiceComponent
+      },
+      {
+        path: 'services/:id',
+        component: ServiceDetailsComponent
       },
       {
         path: 'services',

@@ -27,6 +27,8 @@ import {EditServiceComponent} from './views/edit-service/edit-service.component'
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { ServiceCardComponent } from './components/service-card/service-card.component';
 import {MatDividerModule} from '@angular/material/divider';
+import {NgApexchartsModule} from 'ng-apexcharts';
+import { ServiceDetailsComponent } from './views/service-details/service-details.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,8 @@ import {MatDividerModule} from '@angular/material/divider';
     ConfirmServiceDeleteDialogComponent,
     EditServiceComponent,
     DashboardComponent,
-    ServiceCardComponent
+    ServiceCardComponent,
+    ServiceDetailsComponent
   ],
   imports: [
     BrowserModule,
@@ -58,7 +61,8 @@ import {MatDividerModule} from '@angular/material/divider';
     MatSnackBarModule,
     MatTableModule,
     MatDialogModule,
-    MatDividerModule
+    MatDividerModule,
+    NgApexchartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

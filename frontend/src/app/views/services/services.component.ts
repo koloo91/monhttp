@@ -39,6 +39,7 @@ export class ServicesComponent implements OnInit {
   }
 
   onDeleteClick(service: Service): void {
+    console.log('deleteClicked');
     const dialogRef = this.dialog.open(ConfirmServiceDeleteDialogComponent, {
       data: service
     });
@@ -56,6 +57,7 @@ export class ServicesComponent implements OnInit {
   }
 
   onEditClick(id: string) {
+    console.log('editClicked');
     this.router.navigate(['services', 'edit', id]);
   }
 }

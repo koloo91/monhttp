@@ -168,7 +168,7 @@ func handleIcmpPingServiceType(service model.Service) (*model.Check, *model.Fail
 		return nil, nil, err
 	}
 
-	command := exec.Command(ping, service.Endpoint, "-c", "1", "-W", strconv.Itoa(service.RequestTimeoutInSeconds))
+	command := exec.Command(ping, service.Endpoint, "-c", "1", "-W", strconv.Itoa(service.RequestTimeoutInSeconds*1000))
 	outputBytes, err := command.CombinedOutput()
 	if err != nil {
 		return nil, nil, err
@@ -193,8 +193,8 @@ func handleIcmpPingServiceType(service model.Service) (*model.Check, *model.Fail
 		return check, failure, nil
 	}
 
-	duration, _ := strconv.ParseInt(strs[1], 10, 64)
-	check := model.NewCheck(service.Id, duration, false)
+	duration, _ := strconv.ParseFloat(strs[1], 64)
+	check := model.NewCheck(service.Id, int64(duration), false)
 
 	return check, nil, nil
 }
