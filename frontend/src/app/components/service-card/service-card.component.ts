@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {Average} from '../../models/average.model';
 import {map} from 'rxjs/operators';
 import {Check} from '../../models/check.model';
+import {IsOnline} from '../../models/is-online.model';
 
 @Component({
   selector: 'app-service-card',
@@ -20,6 +21,7 @@ export class ServiceCardComponent implements OnInit {
   cardClicked: EventEmitter<string> = new EventEmitter<string>();
 
   average$: Observable<Average>;
+  isOnline$: Observable<IsOnline>;
 
   checks: Check[] = [];
   chartData: any = [];
@@ -29,6 +31,7 @@ export class ServiceCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.average$ = this.checkService.average(this.service.id);
+    this.isOnline$ = this.checkService.isOnline(this.service.id);
 
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);

@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/repository"
 	"time"
@@ -28,4 +30,12 @@ func GetAverageValues(ctx context.Context, serviceId string) (model.Average, err
 		LastDay:  averageLastDay,
 		LastWeek: averageLastWeek,
 	}, nil
+}
+
+func GetIsOnline(ctx context.Context, serviceId string) (bool, error) {
+	isOnline, err := repository.SelectIsOnline(ctx, serviceId)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
+	return isOnline, err
 }

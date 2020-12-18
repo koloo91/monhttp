@@ -1,7 +1,9 @@
 <div class="service-card-component">
   <mat-card>
     <mat-card-header (click)="onCardClicked()">
-      <mat-card-title>{{service.name}}</mat-card-title>
+      <mat-card-title>
+        {{service.name}}
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div *ngIf="average$ | async as average" class="latency-values" (click)="onCardClicked()">
@@ -31,5 +33,9 @@
         </div>
       </div>
     </mat-card-content>
+    <mat-card-footer *ngIf="isOnline$ | async as isOnline">
+      <span class="badge offline" *ngIf="!isOnline.online">OFFLINE</span>
+      <span class="badge online" *ngIf="isOnline.online">ONLINE</span>
+    </mat-card-footer>
   </mat-card>
 </div>

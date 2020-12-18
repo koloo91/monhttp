@@ -52,3 +52,15 @@ func getAverage(ctx *gin.Context) {
 	averageVo := model.MapAverageEntityToVo(average)
 	ctx.JSON(http.StatusOK, averageVo)
 }
+
+func getIsOnline(ctx *gin.Context) {
+	serviceId := ctx.Param("id")
+
+	isOnline, err := service.GetIsOnline(ctx.Request.Context(), serviceId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.IsOnlineVo{Online: isOnline})
+}

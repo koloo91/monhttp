@@ -11,6 +11,7 @@ import (
 var (
 	selectChecksByServiceIdAndCreatedAtStatement *sql.Stmt
 	selectAverageLatencyStatement                *sql.Stmt
+	selectOnlineStatement                        *sql.Stmt
 )
 
 func prepareCheckStatements() {
@@ -31,6 +32,14 @@ func prepareCheckStatements() {
 															WHERE service_id = $1
 															  AND created_at >= $2
 															  AND created_at <= $3;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	selectOnlineStatement, err = db.Prepare(`SELECT is_failure
+													FROM "check"
+													WHERE service_id = $1
+													ORDER BY created_at DESC LIMIT 1`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,4 +93,14 @@ func SelectAverageLatency(ctx context.Context, serviceId string, from time.Time,
 		return 0, err
 	}
 	return avg, nil
+}
+
+func SelectIsOnline(ctx context.Context, serviceId string) (bool, error) {
+	row := selectOnlineStatement.QueryRowContext(ctx, serviceId)
+
+	var isFailure bool
+	if err := row.Scan(&isFailure); err != nil {
+		return false, err
+	}
+	return !isFailure, nil
 }

@@ -5,6 +5,7 @@ import {Check} from '../models/check.model';
 import {Wrapper} from '../models/wrapper.model';
 import {map} from 'rxjs/operators';
 import {Average} from '../models/average.model';
+import {IsOnline} from '../models/is-online.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,4 +26,7 @@ export class CheckService {
     return this.http.get<Average>(`/api/services/${serviceId}/average`)
   }
 
+  isOnline(serviceId: string): Observable<IsOnline> {
+    return this.http.get<IsOnline>(`/api/services/${serviceId}/online`);
+  }
 }

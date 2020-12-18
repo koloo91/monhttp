@@ -1,5 +1,13 @@
+
 .service-card-component {
   width: 100%;
+
+
+  mat-card-title {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+  }
 
   .latency-values {
     display: flex;
@@ -28,5 +36,25 @@
 
       text-align: center;
     }
+  }
+
+  .badge {
+    color: #fff;
+    border-radius: 0.2rem;
+    padding: 0.25rem;
+    font-size: 75%
+  }
+
+  .offline {
+    background-color: #dd3545;
+  }
+
+  .online {
+    background-color: #28a745;
+  }
+
+  mat-card-footer {
+    display: flex;
+    flex-direction: row-reverse;
   }
 }
