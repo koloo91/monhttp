@@ -22,6 +22,12 @@ func (n *EMailNotifier) GetId() string {
 }
 
 func NewEMailNotifier() *EMailNotifier {
+	data := make(map[string]interface{})
+	data["host"] = viper.GetString("notifier.email.host")
+	data["port"] = viper.GetInt("notifier.email.port")
+	data["from"] = viper.GetString("notifier.email.from")
+	data["password"] = viper.GetString("notifier.email.password")
+	data["to"] = strings.Join(viper.GetStringSlice("notifier.email.to"), ",")
 
 	username := viper.GetString("notifier.email.from")
 	password := viper.GetString("notifier.email.password")
@@ -33,6 +39,7 @@ func NewEMailNotifier() *EMailNotifier {
 			Id:      viper.GetString("notifier.email.id"),
 			Name:    viper.GetString("notifier.email.name"),
 			Enabled: viper.GetBool("notifier.email.enabled"),
+			Data:    data,
 			Form: []model.NotificationForm{
 				{
 					Type:            "text",
@@ -117,4 +124,8 @@ func (n *EMailNotifier) GetForms() []model.NotificationForm {
 
 func (n *EMailNotifier) GetName() string {
 	return n.Name
+}
+
+func (n *EMailNotifier) GetData() map[string]interface{} {
+	return n.Data
 }

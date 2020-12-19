@@ -4,6 +4,7 @@ type Notifier struct {
 	Id      string
 	Name    string
 	Enabled bool
+	Data    map[string]interface{}
 	Form    []NotificationForm
 }
 
@@ -16,9 +17,10 @@ type NotificationForm struct {
 }
 
 type NotifierVo struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Form []NotificationFormVo
+	Id   string                 `json:"id"`
+	Name string                 `json:"name"`
+	Data map[string]interface{} `json:"data"`
+	Form []NotificationFormVo   `json:"form"`
 }
 
 type NotificationFormVo struct {
@@ -36,6 +38,7 @@ type Notify interface {
 	IsEnabled() bool
 	GetForms() []NotificationForm
 	GetName() string
+	GetData() map[string]interface{}
 }
 
 func MapNotifierToVo(n Notify) NotifierVo {
@@ -47,6 +50,7 @@ func MapNotifierToVo(n Notify) NotifierVo {
 	return NotifierVo{
 		Id:   n.GetId(),
 		Name: n.GetName(),
+		Data: n.GetData(),
 		Form: forms,
 	}
 }
