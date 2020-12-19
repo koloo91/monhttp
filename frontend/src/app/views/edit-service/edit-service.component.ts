@@ -83,6 +83,7 @@ export class EditServiceComponent implements OnInit {
     this.formGroup.get('verifySsl').setValue(service.verifySsl);
     this.formGroup.get('enableNotifications').setValue(service.enableNotifications);
     this.formGroup.get('notifyAfterNumberOfFailures').setValue(service.notifyAfterNumberOfFailures);
+    this.formGroup.get('continuouslySendNotifications').setValue(service.continuouslySendNotifications);
   }
 
   updateService(): void {
