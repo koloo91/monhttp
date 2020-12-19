@@ -20,7 +20,9 @@ import (
 func main() {
 
 	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
 	viper.AddConfigPath(".")
+	viper.WatchConfig()
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

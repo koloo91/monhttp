@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/service"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -23,5 +22,10 @@ func updateNotifier(ctx *gin.Context) {
 		return
 	}
 
-	log.Println(id)
+	if err := service.UpdateNotifier(id, body); err != nil {
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "")
 }

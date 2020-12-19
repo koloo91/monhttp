@@ -14,7 +14,9 @@
         <form [formGroup]="notifierFormGroup">
           <div *ngFor="let form of selectedNotifier.form" class="input-row">
             <p class="mat-subheading-1">{{form.title}}</p>
-            <mat-form-field>
+            <mat-slide-toggle *ngIf="form.type === 'switch'"
+                              [formControlName]="form.formControlName"></mat-slide-toggle>
+            <mat-form-field *ngIf="form.type === 'text' || form.type === 'number' || form.type === 'password'">
               <mat-label>{{form.title}}</mat-label>
               <input matInput
                      [type]="form.type"

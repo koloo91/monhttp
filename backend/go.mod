@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/docker/distribution v2.7.1+incompatible
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/golang-migrate/migrate/v4 v4.14.1

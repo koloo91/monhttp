@@ -23,6 +23,7 @@ func (n *EMailNotifier) GetId() string {
 
 func NewEMailNotifier() *EMailNotifier {
 	data := make(map[string]interface{})
+	data["enabled"] = viper.GetBool("notifier.email.enabled")
 	data["host"] = viper.GetString("notifier.email.host")
 	data["port"] = viper.GetInt("notifier.email.port")
 	data["from"] = viper.GetString("notifier.email.from")
@@ -42,46 +43,53 @@ func NewEMailNotifier() *EMailNotifier {
 			Data:    data,
 			Form: []model.NotificationForm{
 				{
+					Type:            "switch",
+					Title:           "Enabled",
+					FormControlName: "enabled",
+					Placeholder:     "Enabled",
+					Required:        false,
+				},
+				{
 					Type:            "text",
 					Title:           "Host",
 					FormControlName: "host",
 					Placeholder:     "Host",
-					Required:        true,
+					Required:        false,
 				},
 				{
 					Type:            "number",
 					Title:           "Port",
 					FormControlName: "port",
 					Placeholder:     "Port",
-					Required:        true,
+					Required:        false,
 				},
 				{
 					Type:            "text",
 					Title:           "From",
 					FormControlName: "from",
 					Placeholder:     "From",
-					Required:        true,
+					Required:        false,
 				},
 				{
 					Type:            "password",
 					Title:           "Password",
 					FormControlName: "password",
 					Placeholder:     "Password",
-					Required:        true,
+					Required:        false,
 				},
 				{
 					Type:            "text",
 					Title:           "To",
 					FormControlName: "to",
 					Placeholder:     "To",
-					Required:        true,
+					Required:        false,
 				},
 			},
 		},
 		Host: viper.GetString("notifier.email.host"),
 		Port: viper.GetInt("notifier.email.port"),
 		From: viper.GetString("notifier.email.from"),
-		To:   viper.GetStringSlice("notifier.email.to"),
+		To:   strings.Split(viper.GetString("notifier.email.to"), ","),
 		Auth: auth,
 	}
 }

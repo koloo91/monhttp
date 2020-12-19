@@ -1,9 +1,11 @@
 package notifier
 
 import (
+	"github.com/fsnotify/fsnotify"
 	"github.com/google/uuid"
 	"github.com/koloo91/monhttp/model"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type NotificationSystem struct {
@@ -19,7 +21,18 @@ func NewNotificationSystem() *NotificationSystem {
 }
 
 func (n *NotificationSystem) SetupDefaultNotifier() {
-	n.notifiers = append(n.notifiers, NewEMailNotifier())
+	load := func() {
+		n.notifiers = append(n.notifiers, NewEMailNotifier())
+		n.notifiers = append(n.notifiers, NewTelegramNotifier())
+	}
+	load()
+
+	viper.OnConfigChange(func(in fsnotify.Event) {
+		log.Println("Config files changed: ", in.Name)
+		// reset notifiers
+		n.notifiers = make([]model.Notify, 0)
+		load()
+	})
 }
 
 func (n *NotificationSystem) Start() {
