@@ -7,13 +7,13 @@ import (
 )
 
 type NotificationSystem struct {
-	notifiers         []Notify
+	notifiers         []model.Notify
 	notificationQueue chan Notification
 }
 
 func NewNotificationSystem() *NotificationSystem {
 	return &NotificationSystem{
-		notifiers:         make([]Notify, 0),
+		notifiers:         make([]model.Notify, 0),
 		notificationQueue: make(chan Notification, 100),
 	}
 }
@@ -26,7 +26,7 @@ func (n *NotificationSystem) Start() {
 	go func() {
 		for notification := range n.notificationQueue {
 			for _, notifier := range n.getEnabledNotifiers() {
-				log.Printf("Sending notification using '%s' notifier", notifier.Id())
+				log.Printf("Sending notification using '%s' notifier", notifier.GetId())
 				if err := notifier.SendFailure(notification.Service, notification.Failure); err != nil {
 					log.Error(err)
 				}
@@ -35,8 +35,8 @@ func (n *NotificationSystem) Start() {
 	}()
 }
 
-func (n *NotificationSystem) getEnabledNotifiers() []Notify {
-	result := make([]Notify, 0, len(n.notifiers))
+func (n *NotificationSystem) getEnabledNotifiers() []model.Notify {
+	result := make([]model.Notify, 0, len(n.notifiers))
 	for _, notifier := range n.notifiers {
 		if notifier.IsEnabled() {
 			result = append(result, notifier)
@@ -52,6 +52,10 @@ func (n *NotificationSystem) AddNotification(notification Notification) {
 	}()
 }
 
+func (n *NotificationSystem) GetNotifiers() []model.Notify {
+	return n.notifiers
+}
+
 type Notification struct {
 	Id      string
 	Service model.Service
@@ -64,17 +68,4 @@ func NewNotification(service model.Service, failure model.Failure) Notification 
 		Service: service,
 		Failure: failure,
 	}
-}
-
-type Notify interface {
-	Id() string
-	SendSuccess(model.Service) error
-	SendFailure(model.Service, model.Failure) error
-	IsEnabled() bool
-}
-
-type Notifier struct {
-	Id      string
-	Name    string
-	Enabled bool
 }

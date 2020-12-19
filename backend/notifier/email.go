@@ -9,7 +9,7 @@ import (
 )
 
 type EMailNotifier struct {
-	Notifier
+	model.Notifier
 	Host string
 	Port int
 	From string
@@ -17,8 +17,8 @@ type EMailNotifier struct {
 	Auth smtp.Auth
 }
 
-func (n *EMailNotifier) Id() string {
-	return n.Name
+func (n *EMailNotifier) GetId() string {
+	return n.Id
 }
 
 func NewEMailNotifier() *EMailNotifier {
@@ -29,10 +29,47 @@ func NewEMailNotifier() *EMailNotifier {
 	auth := smtp.PlainAuth("", username, password, host)
 
 	return &EMailNotifier{
-		Notifier: Notifier{
+		Notifier: model.Notifier{
 			Id:      viper.GetString("notifier.email.id"),
 			Name:    viper.GetString("notifier.email.name"),
 			Enabled: viper.GetBool("notifier.email.enabled"),
+			Form: []model.NotificationForm{
+				{
+					Type:            "text",
+					Title:           "Host",
+					FormControlName: "host",
+					Placeholder:     "Host",
+					Required:        true,
+				},
+				{
+					Type:            "number",
+					Title:           "Port",
+					FormControlName: "port",
+					Placeholder:     "Port",
+					Required:        true,
+				},
+				{
+					Type:            "text",
+					Title:           "From",
+					FormControlName: "from",
+					Placeholder:     "From",
+					Required:        true,
+				},
+				{
+					Type:            "password",
+					Title:           "Password",
+					FormControlName: "password",
+					Placeholder:     "Password",
+					Required:        true,
+				},
+				{
+					Type:            "text",
+					Title:           "To",
+					FormControlName: "to",
+					Placeholder:     "To",
+					Required:        true,
+				},
+			},
 		},
 		Host: viper.GetString("notifier.email.host"),
 		Port: viper.GetInt("notifier.email.port"),
@@ -72,4 +109,12 @@ func (n *EMailNotifier) send(service model.Service, message string) error {
 
 func (n *EMailNotifier) IsEnabled() bool {
 	return n.Enabled
+}
+
+func (n *EMailNotifier) GetForms() []model.NotificationForm {
+	return n.Form
+}
+
+func (n *EMailNotifier) GetName() string {
+	return n.Name
 }
