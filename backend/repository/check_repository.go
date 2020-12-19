@@ -104,3 +104,38 @@ func SelectIsOnline(ctx context.Context, serviceId string) (bool, error) {
 	}
 	return !isFailure, nil
 }
+
+func GetLastNChecks(ctx context.Context, tx *sql.Tx, serviceId string, numberOfEntries int) ([]model.Check, error) {
+	rows, err := tx.QueryContext(ctx, `SELECT id, latency_in_ms, is_failure, created_at 
+								FROM "check" 
+								WHERE service_id = $1
+								ORDER BY created_at DESC
+								LIMIT $2;`, serviceId, numberOfEntries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var id string
+	var latencyInMs int64
+	var isFailure bool
+	var createdAt time.Time
+
+	result := make([]model.Check, 0)
+
+	for rows.Next() {
+		if err := rows.Scan(&id, &latencyInMs, &isFailure, &createdAt); err != nil {
+			return nil, err
+		}
+
+		result = append(result, model.Check{
+			Id:          id,
+			ServiceId:   serviceId,
+			LatencyInMs: latencyInMs,
+			IsFailure:   isFailure,
+			CreatedAt:   createdAt,
+		})
+	}
+
+	return result, nil
+}

@@ -33,7 +33,8 @@ export class EditServiceComponent implements OnInit {
     verifySsl: new FormControl(true),
 
     enableNotifications: new FormControl(true),
-    notifyAfterNumberOfFailures: new FormControl(2, [Validators.min(0), Validators.max(20)])
+    notifyAfterNumberOfFailures: new FormControl(2, [Validators.min(0), Validators.max(20)]),
+    continuouslySendNotifications: new FormControl(false)
   });
 
   selectedServiceType: ServiceType = 'HTTP';
