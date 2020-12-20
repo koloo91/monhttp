@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"crypto/tls"
+	"database/sql"
 	"fmt"
 	"github.com/koloo91/monhttp/model"
+	"github.com/koloo91/monhttp/notifier"
 	"github.com/koloo91/monhttp/repository"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -105,6 +107,20 @@ func processService(serviceId string) {
 	}
 
 	if failure != nil {
+		if service.EnableNotifications {
+			sendNotification, err := shouldSendNotification(ctx, tx, service)
+			if err != nil {
+				if err := tx.Rollback(); err != nil {
+					log.Error(err)
+				}
+				return
+			}
+
+			if sendNotification {
+				notificationSystem.AddNotification(notifier.NewNotification(service, *failure))
+			}
+		}
+
 		if err := repository.InsertFailure(ctx, tx, *failure); err != nil {
 			log.Error("insert failure", err)
 			if err := tx.Rollback(); err != nil {
@@ -117,6 +133,28 @@ func processService(serviceId string) {
 	if err := tx.Commit(); err != nil {
 		log.Error(err)
 	}
+}
+
+func shouldSendNotification(ctx context.Context, tx *sql.Tx, service model.Service) (bool, error) {
+	checks, err := repository.GetLastNChecks(ctx, tx, service.Id, service.NotifyAfterNumberOfFailures)
+	if err != nil {
+		return false, err
+	}
+
+	counter := 0
+	for _, check := range checks {
+		if check.IsFailure {
+			counter++
+		}
+	}
+
+	sendNotification := false
+	if service.ContinuouslySendNotifications {
+		sendNotification = counter+1 >= service.NotifyAfterNumberOfFailures
+	} else {
+		sendNotification = counter+1 == service.NotifyAfterNumberOfFailures
+	}
+	return sendNotification, nil
 }
 
 func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure, error) {
@@ -144,7 +182,7 @@ func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure,
 	start := time.Now()
 	response, err := client.Do(request)
 	if err != nil {
-		return nil, model.NewFailure(service.Id, err.Error()), nil
+		return model.NewCheck(service.Id, 0, true), model.NewFailure(service.Id, err.Error()), nil
 	}
 	defer response.Body.Close()
 

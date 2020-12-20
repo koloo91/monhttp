@@ -17,6 +17,7 @@ export interface Service {
   verifySsl: boolean
   enableNotifications: boolean;
   notifyAfterNumberOfFailures: number;
+  continuouslySendNotifications: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

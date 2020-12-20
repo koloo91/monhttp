@@ -31,6 +31,8 @@ import {ServiceDetailsComponent} from './views/service-details/service-details.c
 import {NgxChartsModule} from '@swimlane/ngx-charts';
 import {NgxMatDatetimePickerModule, NgxMatNativeDateModule} from '@angular-material-components/datetime-picker';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import { SettingsComponent } from './views/settings/settings.component';
+import {MatListModule} from '@angular/material/list';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,8 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
     EditServiceComponent,
     DashboardComponent,
     ServiceCardComponent,
-    ServiceDetailsComponent
+    ServiceDetailsComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -58,6 +61,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
     MatOptionModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatListModule,
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,

@@ -1,7 +1,7 @@
-<div class="service-card-component">
+<div #card class="service-card-component" (window:resize)="cardWidth=card.getBoundingClientRect().width">
   <mat-card>
     <mat-card-header (click)="onCardClicked()">
-      <mat-card-title>
+      <mat-card-title [style.width.px]="(cardWidth || card.getBoundingClientRect().width)-50">
         {{service.name}}
       </mat-card-title>
     </mat-card-header>

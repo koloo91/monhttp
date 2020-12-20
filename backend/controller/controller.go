@@ -28,6 +28,11 @@ func SetupRoutes() *gin.Engine {
 		apiGroup.GET("/services/:id/failures", getFailures)
 	}
 
+	{
+		apiGroup.GET("/notifiers", getNotifiers)
+		apiGroup.PUT("/notifiers/:id", updateNotifier)
+	}
+
 	return router
 }
 

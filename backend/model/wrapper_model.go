@@ -11,3 +11,7 @@ type CheckWrapperVo struct {
 type FailureWrapperVo struct {
 	Data []FailureVo `json:"data"`
 }
+
+type NotifierWrapperVo struct {
+	Data []NotifierVo `json:"data"`
+}
