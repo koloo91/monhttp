@@ -23,6 +23,12 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadNotifiers();
+  }
+
+  loadNotifiers(): void {
+    this.selectedNotifier = null;
+    this.notifierFormGroup = null;
     this.notifiers$ = this.notifierService.list()
       .pipe(
         tap(notifiers => this.notifierSelected(notifiers[0]))
@@ -40,6 +46,9 @@ export class SettingsComponent implements OnInit {
 
   updateNotifier(): void {
     this.notifierService.put(this.selectedNotifier.id, this.notifierFormGroup.value)
-      .subscribe(console.log, console.log);
+      .subscribe(
+        () => this.loadNotifiers(),
+        console.log
+      );
   }
 }

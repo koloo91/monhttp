@@ -1,10 +1,12 @@
 <div id="settings-view">
-  <mat-list class="notifiers-list" *ngIf="notifiers$ | async as notifiers">
-    <mat-list-item class="notifier-entry" *ngFor="let notifier of notifiers" (click)="notifierSelected(notifier)">
-      {{notifier.name}}
-    </mat-list-item>
-  </mat-list>
-
+  <div class="notifiers-list" >
+    <h3 class="mat-title">Notifiers</h3>
+    <mat-selection-list multiple="false" *ngIf="notifiers$ | async as notifiers">
+      <mat-list-option class="notifier-entry" *ngFor="let notifier of notifiers" (click)="notifierSelected(notifier)">
+        {{notifier.name}}
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
   <div class="notifiers-form">
     <mat-card *ngIf="selectedNotifier && notifierFormGroup">
       <mat-card-header>
