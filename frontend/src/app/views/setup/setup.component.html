@@ -1,0 +1,60 @@
+<div id="setup-component">
+  <div class="content">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>monhttp Setup</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form class="setup-form" [formGroup]="setupFormGroup" autocomplete="off">
+          <div class="database">
+            <mat-form-field appearance="outline">
+              <mat-label>Database Host</mat-label>
+              <mat-select value="postgres">
+                <mat-option value="postgres">Postgres</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Database Host</mat-label>
+              <input matInput placeholder="localhost" formControlName="databaseHost" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Database Port</mat-label>
+              <input matInput type="number" placeholder="5432" formControlName="databasePort" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Database User</mat-label>
+              <input matInput placeholder="monhttp_user" formControlName="databaseUser" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Database Password</mat-label>
+              <input matInput type="password" placeholder="123456" formControlName="databasePassword" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Database Name</mat-label>
+              <input matInput placeholder="monhttp" formControlName="databaseName" required>
+            </mat-form-field>
+          </div>
+          <div class="user">
+            <mat-form-field appearance="outline">
+              <mat-label>Username</mat-label>
+              <input matInput placeholder="admin" formControlName="username" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" placeholder="123456" formControlName="password" required>
+            </mat-form-field>
+          </div>
+        </form>
+      </mat-card-content>
+      <mat-card-actions align="right">
+        <button mat-raised-button color="primary" [disabled]="!setupFormGroup.valid" (click)="saveSettings()">Save</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

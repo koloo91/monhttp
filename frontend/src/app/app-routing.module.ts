@@ -7,6 +7,7 @@ import {EditServiceComponent} from './views/edit-service/edit-service.component'
 import {DashboardComponent} from './views/dashboard/dashboard.component';
 import {ServiceDetailsComponent} from './views/service-details/service-details.component';
 import {SettingsComponent} from './views/settings/settings.component';
+import {SetupComponent} from './views/setup/setup.component';
 
 const routes: Routes = [
   {
@@ -38,6 +39,10 @@ const routes: Routes = [
         component: SettingsComponent
       }
     ]
+  },
+  {
+    path: 'setup',
+    component: SetupComponent
   }
 ];
 

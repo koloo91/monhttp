@@ -2,53 +2,38 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Service} from '../models/service.model';
 import {Observable} from 'rxjs';
-import {BaseService} from './base.service';
-import {catchError, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {Wrapper} from '../models/wrapper.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ServiceService extends BaseService {
+export class ServiceService {
 
   constructor(private http: HttpClient) {
-    super();
   }
 
   create(service: Service): Observable<Service> {
-    return this.http.post<Service>('/api/services', service)
-      .pipe(
-        catchError(this.mapError)
-      );
+    return this.http.post<Service>('/api/services', service);
   }
 
   list(): Observable<Service[]> {
     return this.http.get<Wrapper<Service>>('/api/services')
       .pipe(
-        map(wrapper => wrapper.data),
-        catchError(this.mapError)
+        map(wrapper => wrapper.data)
       )
   }
 
   get(id: string): Observable<Service> {
-    return this.http.get<Service>(`/api/services/${id}`)
-      .pipe(
-        catchError(this.mapError)
-      );
+    return this.http.get<Service>(`/api/services/${id}`);
   }
 
   put(id: string, service: Service): Observable<Service> {
     console.log(service);
-    return this.http.put<Service>(`/api/services/${id}`, service)
-      .pipe(
-        catchError(this.mapError)
-      )
+    return this.http.put<Service>(`/api/services/${id}`, service);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`/api/services/${id}`)
-      .pipe(
-        catchError(this.mapError)
-      );
+    return this.http.delete<void>(`/api/services/${id}`);
   }
 }

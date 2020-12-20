@@ -6,7 +6,7 @@ import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ServicesComponent} from './views/services/services.component';
 import {CreateServiceComponent} from './views/create-service/create-service.component';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {BaseComponent} from './views/base/base.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatCardModule} from '@angular/material/card';
@@ -31,8 +31,10 @@ import {ServiceDetailsComponent} from './views/service-details/service-details.c
 import {NgxChartsModule} from '@swimlane/ngx-charts';
 import {NgxMatDatetimePickerModule, NgxMatNativeDateModule} from '@angular-material-components/datetime-picker';
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import { SettingsComponent } from './views/settings/settings.component';
+import {SettingsComponent} from './views/settings/settings.component';
 import {MatListModule} from '@angular/material/list';
+import {ApiErrorInterceptor} from './http_interceptor/api-error.interceptor';
+import { SetupComponent } from './views/setup/setup.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,8 @@ import {MatListModule} from '@angular/material/list';
     DashboardComponent,
     ServiceCardComponent,
     ServiceDetailsComponent,
-    SettingsComponent
+    SettingsComponent,
+    SetupComponent
   ],
   imports: [
     BrowserModule,
@@ -73,7 +76,8 @@ import {MatListModule} from '@angular/material/list';
     MatDatepickerModule,
     NgxMatNativeDateModule
   ],
-  providers: [],
+  providers: [
+    {provide: HTTP_INTERCEPTORS, useClass: ApiErrorInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule {
