@@ -8,11 +8,14 @@ import {DashboardComponent} from './views/dashboard/dashboard.component';
 import {ServiceDetailsComponent} from './views/service-details/service-details.component';
 import {SettingsComponent} from './views/settings/settings.component';
 import {SetupComponent} from './views/setup/setup.component';
+import {LoginComponent} from './views/login/login.component';
+import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: BaseComponent,
+    canActivate: [IsLoggedInGuard],
     children: [
       {
         path: '',
@@ -43,6 +46,10 @@ const routes: Routes = [
   {
     path: 'setup',
     component: SetupComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
   }
 ];
 
