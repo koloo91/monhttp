@@ -19,6 +19,8 @@ export class ApiErrorInterceptor implements HttpInterceptor {
         catchError((error: ApiError) => {
           if (error.message === 'monhttp needs to be setup') {
             this.router.navigate(['setup']);
+          } else if (error.message === 'invalid credentials') {
+            this.router.navigate(['login']);
           } else {
             this.errorService.setError(error);
           }

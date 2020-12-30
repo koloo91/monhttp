@@ -34,7 +34,9 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {SettingsComponent} from './views/settings/settings.component';
 import {MatListModule} from '@angular/material/list';
 import {ApiErrorInterceptor} from './http_interceptor/api-error.interceptor';
-import { SetupComponent } from './views/setup/setup.component';
+import {SetupComponent} from './views/setup/setup.component';
+import {LoginComponent} from './views/login/login.component';
+import {TokenInterceptor} from './http_interceptor/token.interceptor';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,8 @@ import { SetupComponent } from './views/setup/setup.component';
     ServiceCardComponent,
     ServiceDetailsComponent,
     SettingsComponent,
-    SetupComponent
+    SetupComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -77,7 +80,9 @@ import { SetupComponent } from './views/setup/setup.component';
     NgxMatNativeDateModule
   ],
   providers: [
-    {provide: HTTP_INTERCEPTORS, useClass: ApiErrorInterceptor, multi: true}],
+    {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: ApiErrorInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

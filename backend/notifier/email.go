@@ -37,8 +37,8 @@ func NewEMailNotifier() *EMailNotifier {
 
 	return &EMailNotifier{
 		Notifier: model.Notifier{
-			Id:      viper.GetString("notifier.email.id"),
-			Name:    viper.GetString("notifier.email.name"),
+			Id:      "email",
+			Name:    "E-Mail",
 			Enabled: viper.GetBool("notifier.email.enabled"),
 			Data:    data,
 			Form: []model.NotificationForm{
