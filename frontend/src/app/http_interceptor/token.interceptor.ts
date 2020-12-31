@@ -9,7 +9,6 @@ export class TokenInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log('TokenInterceptor');
     if (this.authenticationService.tokenValue) {
       let headers = new HttpHeaders()
       headers = headers.append('Authorization', `Basic ${this.authenticationService.tokenValue}`)

@@ -9,6 +9,7 @@
     height: 100%;
     padding: 8px;
     overflow: scroll;
+    box-sizing: border-box;
   }
 
   @media (min-width: 768px) {

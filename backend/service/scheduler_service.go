@@ -9,6 +9,7 @@ import (
 	"github.com/koloo91/monhttp/notifier"
 	"github.com/koloo91/monhttp/repository"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"regexp"
@@ -173,10 +174,22 @@ func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure,
 		Timeout: time.Duration(service.RequestTimeoutInSeconds) * time.Second,
 	}
 
-	// TODO: add headers, add request body
 	request, err := http.NewRequest(service.HttpMethod, service.Endpoint, strings.NewReader(service.HttpBody))
 	if err != nil {
 		return nil, nil, err
+	}
+
+	headers := strings.Split(service.HttpHeaders, ";")
+	for _, header := range headers {
+		headerValues := strings.Split(header, ":")
+		if len(headerValues) != 2 {
+			continue
+		}
+
+		headerKey := headerValues[0]
+		headerValue := headerValues[1]
+
+		request.Header.Add(headerKey, headerValue)
 	}
 
 	start := time.Now()
@@ -186,6 +199,8 @@ func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure,
 	}
 	defer response.Body.Close()
 
+	latency := time.Since(start)
+
 	if response.StatusCode != service.ExpectedHttpStatusCode {
 		reason := fmt.Sprintf("Expected status code '%d' but got '%d'", service.ExpectedHttpStatusCode, response.StatusCode)
 		failure := model.NewFailure(service.Id, reason)
@@ -194,9 +209,29 @@ func handleHttpServiceType(service model.Service) (*model.Check, *model.Failure,
 		return check, failure, nil
 	}
 
-	// TODO: check body
+	if len(service.ExpectedHttpResponseBody) > 0 {
+		bodyBytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			reason := fmt.Sprintf("Unable to read response body: %s", err.Error())
+			failure := model.NewFailure(service.Id, reason)
+			return model.NewCheck(service.Id, 0, true), failure, nil
+		} else {
+			matched, err := regexp.Match(service.ExpectedHttpResponseBody, bodyBytes)
+			if err != nil {
+				reason := fmt.Sprintf("Unable to read response body: %s", err.Error())
+				failure := model.NewFailure(service.Id, reason)
+				return model.NewCheck(service.Id, 0, true), failure, nil
+			}
 
-	latency := time.Since(start)
+			if !matched {
+				reason := fmt.Sprintf("Body did not match '%s'", service.ExpectedHttpResponseBody)
+				failure := model.NewFailure(service.Id, reason)
+				return model.NewCheck(service.Id, 0, true), failure, nil
+			}
+		}
+
+	}
+
 	return model.NewCheck(service.Id, latency.Milliseconds(), false), nil, nil
 }
 
@@ -224,14 +259,14 @@ func handleIcmpPingServiceType(service model.Service) (*model.Check, *model.Fail
 	}
 
 	r := regexp.MustCompile(`time=(.*) ms`)
-	strs := r.FindStringSubmatch(outputString)
-	if len(strs) < 2 {
+	submatches := r.FindStringSubmatch(outputString)
+	if len(submatches) < 2 {
 		failure := model.NewFailure(service.Id, "could not parse ping duration")
 		check := model.NewCheck(service.Id, 0, true)
 		return check, failure, nil
 	}
 
-	duration, _ := strconv.ParseFloat(strs[1], 64)
+	duration, _ := strconv.ParseFloat(submatches[1], 64)
 	check := model.NewCheck(service.Id, int64(duration), false)
 
 	return check, nil, nil

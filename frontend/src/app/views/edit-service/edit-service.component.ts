@@ -79,6 +79,7 @@ export class EditServiceComponent implements OnInit {
     this.formGroup.get('httpBody').setValue(service.httpBody);
     this.formGroup.get('httpHeaders').setValue(service.httpHeaders);
     this.formGroup.get('expectedHttpStatusCode').setValue(service.expectedHttpStatusCode);
+    this.formGroup.get('expectedHttpResponseBody').setValue(service.expectedHttpResponseBody);
     this.formGroup.get('followRedirects').setValue(service.followRedirects);
     this.formGroup.get('verifySsl').setValue(service.verifySsl);
     this.formGroup.get('enableNotifications').setValue(service.enableNotifications);
