@@ -31,6 +31,15 @@
             <ngx-mat-datetime-picker #toPicker>
             </ngx-mat-datetime-picker>
           </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Time interval</mat-label>
+            <mat-select (selectionChange)="onSelectionChange($event)" formControlName="timeInterval">
+              <mat-option *ngFor="let timeInterval of timeIntervals" [value]="timeInterval.name">
+                {{timeInterval.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </form>
       </div>
     </mat-card-content>

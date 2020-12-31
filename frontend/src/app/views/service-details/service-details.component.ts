@@ -10,6 +10,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {FailureService} from '../../services/failure.service';
 import {Failure} from '../../models/failure.model';
 import {Check} from '../../models/check.model';
+import {MatSelectChange} from '@angular/material/select';
 
 @Component({
   selector: 'app-service-details',
@@ -20,10 +21,10 @@ export class ServiceDetailsComponent implements OnInit {
 
   displayedColumns: string[] = ['reason', 'date'];
 
-
   dateTimeRangeFormGroup = new FormGroup({
     fromDateTime: new FormControl(new Date()),
-    toDateTime: new FormControl(new Date())
+    toDateTime: new FormControl(new Date()),
+    timeInterval: new FormControl('')
   });
 
   service$: Observable<Service>;
@@ -31,6 +32,59 @@ export class ServiceDetailsComponent implements OnInit {
   failures: Failure[] = [];
 
   chartData: any;
+
+  timeIntervals = [
+    {
+      name: '1 minute',
+      get: () => this.setTimeInterval(0, 0, 1)
+    },
+    {
+      name: '5 minutes',
+      get: () => this.setTimeInterval(0, 0, 5)
+    },
+    {
+      name: '15 minutes',
+      get: () => this.setTimeInterval(0, 0, 15)
+    },
+    {
+      name: '30 minutes',
+      get: () => this.setTimeInterval(0, 0, 30)
+    },
+    {
+      name: '1 hour',
+      get: () => this.setTimeInterval(0, 1, 0)
+    },
+    {
+      name: '3 hours',
+      get: () => this.setTimeInterval(0, 3, 0)
+    },
+    {
+      name: '6 hours',
+      get: () => this.setTimeInterval(0, 6, 0)
+    },
+    {
+      name: '12 hours',
+      get: () => this.setTimeInterval(0, 12, 0)
+    },
+    {
+      name: '1 day',
+      get: () => this.setTimeInterval(1, 0, 0)
+    },
+    {
+      name: '7 days',
+      get: () => this.setTimeInterval(7, 0, 0)
+    },
+    {
+      name: '14 days',
+      get: () => this.setTimeInterval(14, 0, 0)
+    },
+    {
+      name: '30 days',
+      get: () => this.setTimeInterval(30, 0, 0)
+    }
+  ];
+
+  selectedInterval: any = this.timeIntervals[2];
 
   constructor(private serviceService: ServiceService,
               private checkService: CheckService,
@@ -81,5 +135,18 @@ export class ServiceDetailsComponent implements OnInit {
           })
         }]
       });
+  }
+
+  setTimeInterval(days: number, hours: number, minutes: number) {
+    this.dateTimeRangeFormGroup.get('toDateTime').setValue(new Date());
+
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+    fromDate.setHours(fromDate.getHours() - hours, fromDate.getMinutes() - minutes);
+    this.dateTimeRangeFormGroup.get('fromDateTime').setValue(fromDate);
+  }
+
+  onSelectionChange($event: MatSelectChange) {
+    this.timeIntervals.find(timeInterval => timeInterval.name === $event.value)?.get();
   }
 }

@@ -73,50 +73,54 @@
           </mat-form-field>
         </div>
 
-        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
-          <p class="mat-subheading-1">HTTP Body</p>
-          <mat-form-field appearance="outline">
-            <mat-label>HTTP Body</mat-label>
-            <input matInput placeholder="HTTP Body"
-                   formControlName="httpBody">
-          </mat-form-field>
-        </div>
+        <div *ngIf="selectedServiceType === 'HTTP'">
+          <div *ngIf="httpMethod === 'POST' || httpMethod === 'PATCH' || httpMethod === 'PUT'">
+            <div class="input-row">
+              <p class="mat-subheading-1">HTTP Body</p>
+              <mat-form-field appearance="outline">
+                <mat-label>HTTP Body</mat-label>
+                <input matInput placeholder="HTTP Body"
+                       formControlName="httpBody">
+              </mat-form-field>
+            </div>
+          </div>
 
-        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
-          <p class="mat-subheading-1">HTTP Headers</p>
-          <mat-form-field appearance="outline">
-            <mat-label>HTTP Headers</mat-label>
-            <input matInput placeholder="Content-Type:application/json;Authorization:Foo"
-                   formControlName="httpHeaders">
-          </mat-form-field>
-        </div>
+          <div class="input-row">
+            <p class="mat-subheading-1">HTTP Headers</p>
+            <mat-form-field appearance="outline">
+              <mat-label>HTTP Headers</mat-label>
+              <input matInput placeholder="Content-Type:application/json;Authorization:Foo"
+                     formControlName="httpHeaders">
+            </mat-form-field>
+          </div>
 
-        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
-          <p class="mat-subheading-1">Expected response body</p>
-          <mat-form-field appearance="outline">
-            <mat-label>Expected response body</mat-label>
-            <input matInput placeholder="Expected response body"
-                   formControlName="expectedHttpResponseBody">
-          </mat-form-field>
-        </div>
+          <div class="input-row">
+            <p class="mat-subheading-1">Expected response body</p>
+            <mat-form-field appearance="outline">
+              <mat-label>Expected response body</mat-label>
+              <input matInput placeholder=".*monhttp.*"
+                     formControlName="expectedHttpResponseBody">
+            </mat-form-field>
+          </div>
 
-        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
-          <p class="mat-subheading-1">Expected response status code</p>
-          <mat-form-field appearance="outline">
-            <mat-label>Expected response status code</mat-label>
-            <input matInput type="number" placeholder="Expected response status code"
-                   formControlName="expectedHttpStatusCode">
-          </mat-form-field>
-        </div>
+          <div class="input-row">
+            <p class="mat-subheading-1">Expected response status code</p>
+            <mat-form-field appearance="outline">
+              <mat-label>Expected response status code</mat-label>
+              <input matInput type="number" placeholder="Expected response status code"
+                     formControlName="expectedHttpStatusCode">
+            </mat-form-field>
+          </div>
 
-        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
-          <p class="mat-subheading-1">Follow redirects</p>
-          <mat-slide-toggle formControlName="followRedirects"></mat-slide-toggle>
-        </div>
+          <div class="input-row">
+            <p class="mat-subheading-1">Follow redirects</p>
+            <mat-slide-toggle formControlName="followRedirects"></mat-slide-toggle>
+          </div>
 
-        <div class="input-row" *ngIf="selectedServiceType === 'HTTP'">
-          <p class="mat-subheading-1">Verify SSL</p>
-          <mat-slide-toggle formControlName="verifySsl"></mat-slide-toggle>
+          <div class="input-row">
+            <p class="mat-subheading-1">Verify SSL</p>
+            <mat-slide-toggle formControlName="verifySsl"></mat-slide-toggle>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -127,22 +131,24 @@
       </mat-card-header>
       <mat-card-content>
         <div class="input-row">
-          <p class="mat-subheading-1">Notify after failures</p>
+          <p class="mat-subheading-1">Enable notifications</p>
           <mat-slide-toggle formControlName="enableNotifications"></mat-slide-toggle>
         </div>
 
-        <div class="input-row">
-          <p class="mat-subheading-1">Notify after failures</p>
-          <mat-form-field appearance="outline">
-            <mat-label>Notify after failures</mat-label>
-            <input matInput type="number" min="1" max="180" placeholder="Notify after failures"
-                   formControlName="notifyAfterNumberOfFailures">
-          </mat-form-field>
-        </div>
+        <div *ngIf="enableNotifications">
+          <div class="input-row">
+            <p class="mat-subheading-1">Notify after failures</p>
+            <mat-form-field appearance="outline">
+              <mat-label>Notify after failures</mat-label>
+              <input matInput type="number" min="1" max="180" placeholder="Notify after failures"
+                     formControlName="notifyAfterNumberOfFailures">
+            </mat-form-field>
+          </div>
 
-        <div class="input-row">
-          <p class="mat-subheading-1">Continuously send notifications</p>
-          <mat-slide-toggle formControlName="continuouslySendNotifications"></mat-slide-toggle>
+          <div class="input-row">
+            <p class="mat-subheading-1">Continuously send notifications</p>
+            <mat-slide-toggle formControlName="continuouslySendNotifications"></mat-slide-toggle>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
