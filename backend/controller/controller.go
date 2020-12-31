@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/service"
@@ -15,7 +16,15 @@ var (
 )
 
 func SetupRoutes() *gin.Engine {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+
+	router.Use(static.Serve("/", static.LocalFile("./public", false)))
+
+	router.NoRoute(func(ctx *gin.Context) {
+		ctx.File("./public/index.html")
+	})
 
 	apiGroup := router.Group("/api")
 
