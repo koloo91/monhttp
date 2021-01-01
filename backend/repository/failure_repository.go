@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	selectFailuresByServiceIdAndCreateAtStatement *sql.Stmt
+	selectFailuresByServiceIdAndCreateAtStatement      *sql.Stmt
+	selectFailuresCountByServiceIdAnCreatedAtStatement *sql.Stmt
 )
 
 func prepareFailureStatements() {
@@ -21,6 +22,15 @@ func prepareFailureStatements() {
 																			  AND created_at <= $3
 																			ORDER BY created_at DESC;`)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	selectFailuresCountByServiceIdAnCreatedAtStatement, err = db.Prepare(`SELECT COUNT(id)
+																					FROM failure
+																					WHERE service_id = $1
+																					AND created_at >= $2
+																					AND created_at <= $3;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,4 +71,16 @@ func SelectFailures(ctx context.Context, serviceId string, from, to time.Time) (
 	}
 
 	return result, nil
+}
+
+func SelectFailuresCount(ctx context.Context, serviceId string, from, to time.Time) (int, error) {
+	row := selectFailuresCountByServiceIdAnCreatedAtStatement.QueryRowContext(ctx, serviceId, from, to)
+
+	var count int
+
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
