@@ -14,11 +14,16 @@ export class FailureService {
   constructor(private http: HttpClient) {
   }
 
-  list(serviceId: string, from: string, to: string): Observable<Failure[]> {
-    return this.http.get<Wrapper<Failure>>(`/api/services/${serviceId}/failures`, {params: {from, to}})
-      .pipe(
-        map(wrapper => wrapper.data)
-      );
+  list(serviceId: string, from: string, to: string, pageSize: number, page: number): Observable<Wrapper<Failure>> {
+    return this.http.get<Wrapper<Failure>>(`/api/services/${serviceId}/failures`, {
+      params:
+        {
+          from,
+          to,
+          pageSize: `${pageSize}`,
+          page: `${page}`
+        }
+    });
   }
 
   count(serviceId: string, from: string, to: string): Observable<FailureCount> {

@@ -4,13 +4,14 @@ import {CheckService} from '../../services/check.service';
 import {ErrorService} from '../../services/error.service';
 import {ActivatedRoute} from '@angular/router';
 import {map, switchMap} from 'rxjs/operators';
-import {combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {Service} from '../../models/service.model';
 import {FormControl, FormGroup} from '@angular/forms';
 import {FailureService} from '../../services/failure.service';
 import {Failure} from '../../models/failure.model';
 import {Check} from '../../models/check.model';
 import {MatSelectChange} from '@angular/material/select';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-service-details',
@@ -86,11 +87,19 @@ export class ServiceDetailsComponent implements OnInit {
 
   selectedInterval: any = this.timeIntervals[2];
 
+  failureItemsPageSize = 10;
+  failureItemsPerPage = [5, 10, 25, 50];
+  failureItemsLength = 0;
+
+  failurePaginatorEventSubject = new BehaviorSubject<PageEvent>({length: 0, pageSize: this.failureItemsPageSize, pageIndex: 0});
+  failurePaginatorEvent$: Observable<PageEvent>;
+
   constructor(private serviceService: ServiceService,
               private checkService: CheckService,
               private failureService: FailureService,
               private errorService: ErrorService,
               private route: ActivatedRoute) {
+    this.failurePaginatorEvent$ = this.failurePaginatorEventSubject.asObservable();
   }
 
   ngOnInit(): void {
@@ -104,15 +113,18 @@ export class ServiceDetailsComponent implements OnInit {
     yesterday.setDate(yesterday.getDate() - 1);
 
     this.loadChartData();
-    combineLatest([this.route.params, this.dateTimeRangeFormGroup.valueChanges])
+    combineLatest([this.route.params, this.dateTimeRangeFormGroup.valueChanges, this.failurePaginatorEvent$])
       .pipe(
-        map(([params, formValues]) => [params['id'], formValues]),
+        map(([params, formValues, pageEvent]) => [params['id'], formValues, pageEvent]),
         switchMap(([id, {
           fromDateTime,
           toDateTime
-        }]) => this.failureService.list(id, fromDateTime.toISOString(), toDateTime.toISOString()))
+        }, pageEvent]) => this.failureService.list(id, fromDateTime.toISOString(), toDateTime.toISOString(), pageEvent.pageSize, pageEvent.pageIndex))
       )
-      .subscribe(data => this.failures = data, console.log);
+      .subscribe(wrapper => {
+        this.failures = wrapper.data;
+        this.failureItemsLength = wrapper.totalCount;
+      }, console.log);
 
     this.dateTimeRangeFormGroup.get('fromDateTime').setValue(yesterday);
   }
@@ -148,5 +160,9 @@ export class ServiceDetailsComponent implements OnInit {
 
   onSelectionChange($event: MatSelectChange) {
     this.timeIntervals.find(timeInterval => timeInterval.name === $event.value)?.get();
+  }
+
+  onFailurePageChanged(pageEvent: PageEvent) {
+    this.failurePaginatorEventSubject.next(pageEvent);
   }
 }

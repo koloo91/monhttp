@@ -87,6 +87,12 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
+      <mat-paginator [pageSizeOptions]="failureItemsPerPage"
+                     [pageSize]="failureItemsPageSize"
+                     [length]="failureItemsLength"
+                     (page)="onFailurePageChanged($event)"
+                     showFirstLastButtons></mat-paginator>
+
       <div *ngIf="failures.length === 0" class="no-entries-found">
         <div>No entries found for this timeframe</div>
       </div>
