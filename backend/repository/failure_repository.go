@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	selectFailuresByServiceIdAndCreateAtStatement *sql.Stmt
+	selectFailuresByServiceIdAndCreateAtStatement      *sql.Stmt
+	selectFailuresCountByServiceIdAnCreatedAtStatement *sql.Stmt
 )
 
 func prepareFailureStatements() {
@@ -19,8 +20,19 @@ func prepareFailureStatements() {
 																			WHERE service_id = $1
 																			  AND created_at >= $2
 																			  AND created_at <= $3
-																			ORDER BY created_at DESC;`)
+																			ORDER BY created_at DESC
+																			LIMIT $4 
+																			OFFSET $5;`)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	selectFailuresCountByServiceIdAnCreatedAtStatement, err = db.Prepare(`SELECT COUNT(id)
+																					FROM failure
+																					WHERE service_id = $1
+																					AND created_at >= $2
+																					AND created_at <= $3;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,8 +47,8 @@ func InsertFailure(ctx context.Context, tx *sql.Tx, failure model.Failure) error
 	return nil
 }
 
-func SelectFailures(ctx context.Context, serviceId string, from, to time.Time) ([]model.Failure, error) {
-	rows, err := selectFailuresByServiceIdAndCreateAtStatement.QueryContext(ctx, serviceId, from, to)
+func SelectFailures(ctx context.Context, serviceId string, from, to time.Time, limit, offset int) ([]model.Failure, error) {
+	rows, err := selectFailuresByServiceIdAndCreateAtStatement.QueryContext(ctx, serviceId, from, to, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -61,4 +73,16 @@ func SelectFailures(ctx context.Context, serviceId string, from, to time.Time) (
 	}
 
 	return result, nil
+}
+
+func SelectFailuresCount(ctx context.Context, serviceId string, from, to time.Time) (int, error) {
+	row := selectFailuresCountByServiceIdAnCreatedAtStatement.QueryRowContext(ctx, serviceId, from, to)
+
+	var count int
+
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

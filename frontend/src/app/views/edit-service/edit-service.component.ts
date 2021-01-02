@@ -101,4 +101,12 @@ export class EditServiceComponent implements OnInit {
     );
 
   }
+
+  get enableNotifications(): boolean {
+    return (this.formGroup.get('enableNotifications') as FormControl).value;
+  }
+
+  get httpMethod(): string {
+    return (this.formGroup.get('httpMethod') as FormControl).value;
+  }
 }

@@ -1,18 +1,24 @@
 package model
 
 type Average struct {
-	LastDay  int
-	LastWeek int
+	LastDayResponseTime  int
+	LastWeekResponseTime int
+	LastDayUptime        float64
+	LastWeekUptime       float64
 }
 
 type AverageVo struct {
-	LastDay  int `json:"lastDay"`
-	LastWeek int `json:"lastWeek"`
+	LastDayResponseTime  int     `json:"lastDayResponseTime"`
+	LastWeekResponseTime int     `json:"lastWeekResponseTime"`
+	LastDayUptime        float64 `json:"lastDayUptime"`
+	LastWeekUptime       float64 `json:"lastWeekUptime"`
 }
 
 func MapAverageEntityToVo(entity Average) AverageVo {
 	return AverageVo{
-		LastDay:  entity.LastDay,
-		LastWeek: entity.LastWeek,
+		LastDayResponseTime:  entity.LastDayResponseTime,
+		LastWeekResponseTime: entity.LastWeekResponseTime,
+		LastDayUptime:        entity.LastDayUptime,
+		LastWeekUptime:       entity.LastWeekUptime,
 	}
 }

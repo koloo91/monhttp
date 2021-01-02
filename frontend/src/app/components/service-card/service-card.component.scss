@@ -37,21 +37,6 @@
     }
   }
 
-  .badge {
-    color: #fff;
-    border-radius: 0.2rem;
-    padding: 0.25rem;
-    font-size: 75%
-  }
-
-  .offline {
-    background-color: #dd3545;
-  }
-
-  .online {
-    background-color: #28a745;
-  }
-
   mat-card-footer {
     display: flex;
     flex-direction: row-reverse;

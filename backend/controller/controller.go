@@ -63,6 +63,7 @@ func SetupRoutes() *gin.Engine {
 
 	{
 		apiGroup.GET("/services/:id/failures", getFailures)
+		apiGroup.GET("/services/:id/failures/count", getFailureCount)
 	}
 
 	{

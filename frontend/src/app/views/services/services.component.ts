@@ -1,13 +1,19 @@
 import {Component, OnInit} from '@angular/core';
 import {ServiceService} from '../../services/service.service';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
 import {Service} from '../../models/service.model';
 import {Router} from '@angular/router';
 import {ErrorService} from '../../services/error.service';
-import {catchError, switchAll, switchMap} from 'rxjs/operators';
-import {ApiError} from '../../models/api-error.model';
+import {map, switchMap} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmServiceDeleteDialogComponent} from '../../components/dialogs/confirm-service-delete-dialog/confirm-service-delete-dialog.component';
+import {CheckService} from '../../services/check.service';
+import {FailureService} from '../../services/failure.service';
+
+interface ServiceWithStatusAndFailures extends Service {
+  isOnline: boolean;
+  failureCount: number;
+}
 
 @Component({
   selector: 'app-services',
@@ -16,11 +22,13 @@ import {ConfirmServiceDeleteDialogComponent} from '../../components/dialogs/conf
 })
 export class ServicesComponent implements OnInit {
 
-  displayedColumns: string[] = ['name', 'status', 'visibility', 'failures', 'actions'];
+  displayedColumns: string[] = ['name', 'status', /*'visibility',*/ 'failures', 'actions'];
 
-  dataSource$: Observable<Service[]>;
+  dataSource$: Observable<ServiceWithStatusAndFailures[]>;
 
   constructor(private serviceService: ServiceService,
+              private checkService: CheckService,
+              private failureService: FailureService,
               private errorService: ErrorService,
               private router: Router,
               public dialog: MatDialog) {
@@ -31,7 +39,30 @@ export class ServicesComponent implements OnInit {
   }
 
   loadServices() {
-    this.dataSource$ = this.serviceService.list();
+    this.dataSource$ = this.serviceService.list()
+      .pipe(
+        map(services => services.map(service => service as ServiceWithStatusAndFailures)),
+        switchMap(services => forkJoin([...services.map(service => {
+          return this.checkService.isOnline(service.id)
+            .pipe(
+              map(isOnline => {
+                service.isOnline = isOnline.online;
+                return service;
+              })
+            )
+        })])),
+        switchMap(services => forkJoin([...services.map(service => {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          return this.failureService.count(service.id, yesterday.toISOString(), new Date().toISOString())
+            .pipe(
+              map(failureCount => {
+                service.failureCount = failureCount.count;
+                return service;
+              })
+            );
+        })]))
+      );
   }
 
   onCreateClick() {
@@ -39,7 +70,6 @@ export class ServicesComponent implements OnInit {
   }
 
   onDeleteClick(service: Service): void {
-    console.log('deleteClicked');
     const dialogRef = this.dialog.open(ConfirmServiceDeleteDialogComponent, {
       data: service
     });
@@ -56,8 +86,11 @@ export class ServicesComponent implements OnInit {
     })
   }
 
-  onEditClick(id: string) {
-    console.log('editClicked');
+  onEditClick(id: string): void {
     this.router.navigate(['services', 'edit', id]);
+  }
+
+  onShowChartClick(id: string): void {
+    this.router.navigate(['services', id]);
   }
 }

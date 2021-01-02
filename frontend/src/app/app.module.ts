@@ -37,6 +37,7 @@ import {ApiErrorInterceptor} from './http_interceptor/api-error.interceptor';
 import {SetupComponent} from './views/setup/setup.component';
 import {LoginComponent} from './views/login/login.component';
 import {TokenInterceptor} from './http_interceptor/token.interceptor';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -77,7 +78,8 @@ import {TokenInterceptor} from './http_interceptor/token.interceptor';
     NgxChartsModule,
     NgxMatDatetimePickerModule,
     MatDatepickerModule,
-    NgxMatNativeDateModule
+    NgxMatNativeDateModule,
+    MatPaginatorModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},

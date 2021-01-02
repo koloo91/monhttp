@@ -1,4 +1,6 @@
 export interface Average {
-  lastDay: number;
-  lastWeek: number;
+  lastDayResponseTime: number;
+  lastWeekResponseTime: number;
+  lastDayUptime: number;
+  lastWeekUptime: number;
 }
