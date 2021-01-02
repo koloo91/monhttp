@@ -29,6 +29,7 @@ func SetupRoutes() *gin.Engine {
 	apiGroup := router.Group("/api")
 
 	{
+		apiGroup.GET("/setup", getSetup)
 		apiGroup.POST("/settings", postSettings)
 	}
 

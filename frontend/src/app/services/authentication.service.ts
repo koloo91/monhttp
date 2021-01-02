@@ -11,11 +11,8 @@ export class AuthenticationService {
   public token: Observable<string>;
 
   constructor(private http: HttpClient) {
-    this.loadToken();
-  }
-
-  loadToken(): void {
     this.tokenSubject = new BehaviorSubject<string>(localStorage.getItem('userToken'));
+    this.token = this.tokenSubject.asObservable();
   }
 
   checkLogin(): Observable<void> {
@@ -24,13 +21,13 @@ export class AuthenticationService {
 
   storeUsernameAndPassword(username: string, password: string): Observable<string> {
     localStorage.setItem('userToken', btoa(`${username}:${password}`));
-    this.loadToken();
+    this.tokenSubject.next(btoa(`${username}:${password}`))
     return of(btoa(`${username}:${password}`));
   }
 
   clearToken(): void {
     localStorage.setItem('userToken', null);
-    this.loadToken();
+    this.tokenSubject.next(null);
   }
 
   public get tokenValue(): string {

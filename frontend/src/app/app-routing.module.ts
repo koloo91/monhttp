@@ -10,12 +10,12 @@ import {SettingsComponent} from './views/settings/settings.component';
 import {SetupComponent} from './views/setup/setup.component';
 import {LoginComponent} from './views/login/login.component';
 import {IsLoggedInGuard} from './guards/is-logged-in.guard';
+import {IsSetupGuard} from './guards/is-setup.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: BaseComponent,
-    canActivate: [IsLoggedInGuard],
     children: [
       {
         path: '',
@@ -45,11 +45,13 @@ const routes: Routes = [
   },
   {
     path: 'setup',
-    component: SetupComponent
+    component: SetupComponent,
+    canActivate: [IsSetupGuard]
   },
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [IsLoggedInGuard]
   }
 ];
 
