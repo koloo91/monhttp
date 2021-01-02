@@ -86,8 +86,11 @@ export class ServicesComponent implements OnInit {
     })
   }
 
-  onEditClick(id: string) {
-    console.log('editClicked');
+  onEditClick(id: string): void {
     this.router.navigate(['services', 'edit', id]);
+  }
+
+  onShowChartClick(id: string): void {
+    this.router.navigate(['services', id]);
   }
 }
