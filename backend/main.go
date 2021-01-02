@@ -16,7 +16,7 @@ func main() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("./config")
 	viper.WatchConfig()
 
 	service.SetIsSetup(true)

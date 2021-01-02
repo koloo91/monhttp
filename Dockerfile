@@ -11,8 +11,9 @@ COPY backend/ .
 RUN go build -o monhttp
 
 FROM alpine
-WORKDIR /app
+WORKDIR /monhttp
+RUN mkdir -p /monhttp/config
 COPY backend/migrations ./migrations/
-COPY --from=backend /app/ .
+COPY --from=backend /app/monhttp ./monhttp
 COPY --from=frontend /app/dist/monhttp/ ./public/
 ENTRYPOINT ["./monhttp"]

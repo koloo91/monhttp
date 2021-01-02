@@ -81,7 +81,8 @@ export class ServicesComponent implements OnInit {
 
       this.dataSource$ = this.serviceService.delete(service.id)
         .pipe(
-          switchMap(() => this.serviceService.list())
+          switchMap(() => this.serviceService.list()),
+          map(services => services as ServiceWithStatusAndFailures[])
         );
     })
   }

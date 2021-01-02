@@ -62,7 +62,7 @@ func MapServiceVoToEntity(vo ServiceVo) Service {
 		Name:                          vo.Name,
 		Type:                          vo.Type,
 		IntervalInSeconds:             vo.IntervalInSeconds,
-		NextCheckTime:                 time.Now().Add(time.Duration(vo.IntervalInSeconds) * time.Second),
+		NextCheckTime:                 time.Now(),
 		Endpoint:                      vo.Endpoint,
 		HttpMethod:                    vo.HttpMethod,
 		RequestTimeoutInSeconds:       vo.RequestTimeoutInSeconds,
