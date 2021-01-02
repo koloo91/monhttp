@@ -15,20 +15,32 @@ func GetChecks(ctx context.Context, serviceId string, from, to time.Time) ([]mod
 
 func GetAverageValues(ctx context.Context, serviceId string) (model.Average, error) {
 	oneDayBefore := time.Now().AddDate(0, 0, -1)
-	averageLastDay, err := repository.SelectAverageLatency(ctx, serviceId, oneDayBefore, time.Now())
+	averageResponseTimeLastDay, err := repository.SelectAverageLatency(ctx, serviceId, oneDayBefore, time.Now())
 	if err != nil {
 		return model.Average{}, err
 	}
 
 	oneWeekBefore := time.Now().AddDate(0, 0, -7)
-	averageLastWeek, err := repository.SelectAverageLatency(ctx, serviceId, oneWeekBefore, time.Now())
+	averageResponseTimeLastWeek, err := repository.SelectAverageLatency(ctx, serviceId, oneWeekBefore, time.Now())
+	if err != nil {
+		return model.Average{}, err
+	}
+
+	successLastDay, failuresLastDay, err := repository.SelectUptime(ctx, serviceId, oneDayBefore, time.Now())
+	if err != nil {
+		return model.Average{}, err
+	}
+
+	successLastWeek, failuresLastWeek, err := repository.SelectUptime(ctx, serviceId, oneWeekBefore, time.Now())
 	if err != nil {
 		return model.Average{}, err
 	}
 
 	return model.Average{
-		LastDay:  averageLastDay,
-		LastWeek: averageLastWeek,
+		LastDayResponseTime:  averageResponseTimeLastDay,
+		LastWeekResponseTime: averageResponseTimeLastWeek,
+		LastDayUptime:        (successLastDay / (successLastDay + failuresLastDay)) * 100,
+		LastWeekUptime:       (successLastWeek / (successLastWeek + failuresLastWeek)) * 100,
 	}, nil
 }
 

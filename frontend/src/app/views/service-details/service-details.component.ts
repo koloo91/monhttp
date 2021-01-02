@@ -12,6 +12,8 @@ import {Failure} from '../../models/failure.model';
 import {Check} from '../../models/check.model';
 import {MatSelectChange} from '@angular/material/select';
 import {PageEvent} from '@angular/material/paginator';
+import {IsOnline} from '../../models/is-online.model';
+import {Average} from '../../models/average.model';
 
 @Component({
   selector: 'app-service-details',
@@ -29,6 +31,9 @@ export class ServiceDetailsComponent implements OnInit {
   });
 
   service$: Observable<Service>;
+  isOnline$: Observable<IsOnline>;
+  averageValues$: Observable<Average>;
+
   checks: Check[] = [];
   failures: Failure[] = [];
 
@@ -91,7 +96,11 @@ export class ServiceDetailsComponent implements OnInit {
   failureItemsPerPage = [5, 10, 25, 50];
   failureItemsLength = 0;
 
-  failurePaginatorEventSubject = new BehaviorSubject<PageEvent>({length: 0, pageSize: this.failureItemsPageSize, pageIndex: 0});
+  failurePaginatorEventSubject = new BehaviorSubject<PageEvent>({
+    length: 0,
+    pageSize: this.failureItemsPageSize,
+    pageIndex: 0
+  });
   failurePaginatorEvent$: Observable<PageEvent>;
 
   constructor(private serviceService: ServiceService,
@@ -107,6 +116,18 @@ export class ServiceDetailsComponent implements OnInit {
       .pipe(
         map(params => params['id'] as string),
         switchMap(id => this.serviceService.get(id))
+      );
+
+    this.isOnline$ = this.route.params
+      .pipe(
+        map(params => params['id'] as string),
+        switchMap(id => this.checkService.isOnline(id))
+      );
+
+    this.averageValues$ = this.route.params
+      .pipe(
+        map(params => params['id'] as string),
+        switchMap(id => this.checkService.average(id))
       );
 
     const yesterday = new Date();

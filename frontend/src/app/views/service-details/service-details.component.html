@@ -1,10 +1,34 @@
 <div id="service-details-component">
   <mat-card *ngIf="service$ | async as service">
     <mat-card-header>
-      <mat-card-title>{{service.name}}</mat-card-title>
+      <mat-card-title>
+        <span *ngIf="isOnline$ | async as isOnline" class="badge online"
+              [class.online]="isOnline.online"
+              [class.offline]="!isOnline.online">
+          {{isOnline.online ? 'Online' : 'Offline'}}
+        </span>
+        {{service.name}}
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      1234 ms
+      <div class="service-statistics" *ngIf="averageValues$ | async as averageValues">
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastDayResponseTime}} ms</div>
+          <div class="mat-small">Average response last 24 hours</div>
+        </div>
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastWeekResponseTime}} ms</div>
+          <div class="mat-small">Average response last 7 days</div>
+        </div>
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastDayUptime  | number:'1.2-2'}} %</div>
+          <div class="mat-small">Uptime last 24 hours</div>
+        </div>
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastWeekUptime | number:'1.2-2'}} %</div>
+          <div class="mat-small">Uptime last 7 days</div>
+        </div>
+      </div>
     </mat-card-content>
   </mat-card>
 
