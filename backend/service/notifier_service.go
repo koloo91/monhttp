@@ -14,5 +14,8 @@ func UpdateNotifier(id string, body map[string]interface{}) error {
 	for k, v := range body {
 		viper.Set(fmt.Sprintf("notifier.%s.%s", id, k), v)
 	}
+
+	notificationSystem.SetupDefaultNotifier()
+
 	return viper.WriteConfig()
 }

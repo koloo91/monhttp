@@ -35,7 +35,7 @@ func UpdateSettings(settings model.SettingsVo) error {
 
 	onAdminSetCallback(settings.Username, settings.Password)
 
-	return viper.WriteConfigAs("config.yml")
+	return viper.WriteConfigAs("./config/config.yml")
 }
 
 func LoadUsers() map[string]string {

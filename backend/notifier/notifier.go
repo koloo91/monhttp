@@ -21,6 +21,8 @@ func NewNotificationSystem() *NotificationSystem {
 }
 
 func (n *NotificationSystem) SetupDefaultNotifier() {
+	n.notifiers = make([]model.Notify, 0)
+
 	load := func() {
 		n.notifiers = append(n.notifiers, NewEMailNotifier())
 		n.notifiers = append(n.notifiers, NewTelegramNotifier())
