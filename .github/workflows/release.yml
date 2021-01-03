@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Increment version
+      run: ./increment_version.sh $(cat version) > version
+    - name: Build the Docker image
+      run: docker build -t koloooo/monhttp:$(cat version) -t koloooo/monhttp:latest .
+    - name: Publish to Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: koloooo/monhttp
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
