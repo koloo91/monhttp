@@ -36,11 +36,21 @@ func GetAverageValues(ctx context.Context, serviceId string) (model.Average, err
 		return model.Average{}, err
 	}
 
+	var lastDayUptime float64 = 0
+	if successLastDay+failuresLastDay > 0 {
+		lastDayUptime = (successLastDay / (successLastDay + failuresLastDay)) * 100
+	}
+
+	var lastWeekUptime float64 = 0
+	if successLastWeek+failuresLastWeek > 0 {
+		lastWeekUptime = (successLastWeek / (successLastWeek + failuresLastWeek)) * 100
+	}
+
 	return model.Average{
 		LastDayResponseTime:  averageResponseTimeLastDay,
 		LastWeekResponseTime: averageResponseTimeLastWeek,
-		LastDayUptime:        (successLastDay / (successLastDay + failuresLastDay)) * 100,
-		LastWeekUptime:       (successLastWeek / (successLastWeek + failuresLastWeek)) * 100,
+		LastDayUptime:        lastDayUptime,
+		LastWeekUptime:       lastWeekUptime,
 	}, nil
 }
 

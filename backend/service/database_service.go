@@ -59,12 +59,12 @@ func LoadDatabase() error {
 	var err error
 	database, err = connectToDatabase()
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Unable to connect to database: '%s'", err)
 		return err
 	}
 
 	if err := runDatabaseMigrations(database); err != nil {
-		log.Error(err)
+		log.Errorf("Unable to run database migrations: '%s'", err)
 		return err
 	}
 

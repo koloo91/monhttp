@@ -22,18 +22,21 @@ func getFailures(ctx *gin.Context) {
 
 	var queryParameter GetFailuresQueryParameter
 	if err := ctx.ShouldBindQuery(&queryParameter); err != nil {
+		log.Errorf("Unable to get query parameter: '%s'", err)
 		ctx.JSON(http.StatusBadRequest, toApiError(err))
 		return
 	}
 
 	failures, err := service.GetFailures(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To, *queryParameter.PageSize, *queryParameter.Page)
 	if err != nil {
+		log.Errorf("Unable to get is failures from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}
 
 	failureCount, err := service.GetFailuresCount(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To)
 	if err != nil {
+		log.Errorf("Unable to get is failures count from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}
@@ -55,21 +58,21 @@ func getFailureCount(ctx *gin.Context) {
 
 	from, err := time.Parse(time.RFC3339, fromString)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Unable to parse from date '%s' - '%s'", fromString, err)
 		ctx.JSON(http.StatusBadRequest, toApiError(fmt.Errorf("date must be in format '%s'", time.RFC3339)))
 		return
 	}
 
 	to, err := time.Parse(time.RFC3339, toString)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Unable to parse to date '%s' - '%s'", toString, err)
 		ctx.JSON(http.StatusBadRequest, toApiError(fmt.Errorf("date must be in format '%s'", time.RFC3339)))
 		return
 	}
 
 	failureCount, err := service.GetFailuresCount(ctx.Request.Context(), serviceId, from, to)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Unable to get is failures count from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}

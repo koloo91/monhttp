@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/service"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -18,11 +19,13 @@ func updateNotifier(ctx *gin.Context) {
 
 	var body map[string]interface{}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
+		log.Errorf("Unable to bind json body: '%s'", err)
 		ctx.JSON(http.StatusBadRequest, toApiError(err))
 		return
 	}
 
 	if err := service.UpdateNotifier(id, body); err != nil {
+		log.Errorf("Unable to update notifier '%s' - '%s'", id, err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}
