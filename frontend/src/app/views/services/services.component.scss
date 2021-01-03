@@ -1,0 +1,19 @@
+#services-component {
+  .create-button-container {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+
+  table {
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  .menu-spacer {
+    flex: 1 1 auto;
+  }
+
+  .delete-button {
+    color: red;
+  }
+}

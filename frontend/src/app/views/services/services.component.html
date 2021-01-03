@@ -1,0 +1,52 @@
+<div id="services-component">
+  <div class="create-button-container">
+    <button mat-raised-button color="primary" (click)="onCreateClick()">Create</button>
+  </div>
+  <table mat-table [dataSource]="dataSource$" class="mat-elevation-z2">
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status</th>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="element.isOnline" class="badge online">
+          Online
+        </span>
+        <span *ngIf="!element.isOnline" class="badge offline">
+          Offline
+        </span>
+      </td>
+    </ng-container>
+
+<!--    <ng-container matColumnDef="visibility">-->
+<!--      <th mat-header-cell *matHeaderCellDef> Visibility</th>-->
+<!--      <td mat-cell *matCellDef="let element"> Public</td>-->
+<!--    </ng-container>-->
+
+    <ng-container matColumnDef="failures">
+      <th mat-header-cell *matHeaderCellDef> Failures 24h</th>
+      <td mat-cell *matCellDef="let element"> {{element.failureCount}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="onEditClick(element.id)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onShowChartClick(element.id)">
+          <mat-icon>stacked_line_chart</mat-icon>
+        </button>
+        <button mat-icon-button class="delete-button" (click)="onDeleteClick(element)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

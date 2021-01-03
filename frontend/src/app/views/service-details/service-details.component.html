@@ -1,0 +1,125 @@
+<div id="service-details-component">
+  <mat-card *ngIf="service$ | async as service">
+    <mat-card-header>
+      <mat-card-title>
+        <span *ngIf="isOnline$ | async as isOnline" class="badge online"
+              [class.online]="isOnline.online"
+              [class.offline]="!isOnline.online">
+          {{isOnline.online ? 'Online' : 'Offline'}}
+        </span>
+        {{service.name}}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="service-statistics" *ngIf="averageValues$ | async as averageValues">
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastDayResponseTime}} ms</div>
+          <div class="mat-small">Average response last 24 hours</div>
+        </div>
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastWeekResponseTime}} ms</div>
+          <div class="mat-small">Average response last 7 days</div>
+        </div>
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastDayUptime  | number:'1.2-2'}} %</div>
+          <div class="mat-small">Uptime last 24 hours</div>
+        </div>
+        <div class="statistic-column">
+          <div class="mat-subheading-2">{{averageValues.lastWeekUptime | number:'1.2-2'}} %</div>
+          <div class="mat-small">Uptime last 7 days</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Timeframe</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <div class="time-range-container">
+        <form [formGroup]="dateTimeRangeFormGroup" class="time-range-form">
+          <mat-form-field appearance="outline">
+            <input matInput [ngxMatDatetimePicker]="fromPicker"
+                   placeholder="Choose a date" formControlName="fromDateTime">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #fromPicker>
+            </ngx-mat-datetime-picker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <input matInput [ngxMatDatetimePicker]="toPicker"
+                   placeholder="Choose a date" formControlName="toDateTime">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #toPicker>
+            </ngx-mat-datetime-picker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Time interval</mat-label>
+            <mat-select (selectionChange)="onSelectionChange($event)" formControlName="timeInterval">
+              <mat-option *ngFor="let timeInterval of timeIntervals" [value]="timeInterval.name">
+                {{timeInterval.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Service latency</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container" *ngIf="checks.length !== 0">
+        <ngx-charts-line-chart
+          [xAxis]="true"
+          [yAxis]="true"
+          [yAxisLabel]="'Latency in ms'"
+          [showYAxisLabel]="true"
+          [autoScale]="true"
+          [trimXAxisTicks]="false"
+          [results]="chartData">
+        </ngx-charts-line-chart>
+      </div>
+      <div *ngIf="checks.length === 0" class="no-entries-found">
+        <div>No entries found for this timeframe</div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Failures</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="failures" class="failures-table" *ngIf="failures.length !== 0">
+        <ng-container matColumnDef="reason">
+          <th mat-header-cell *matHeaderCellDef> Reason</th>
+          <td mat-cell *matCellDef="let element"> {{element.reason}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef> Date</th>
+          <td mat-cell *matCellDef="let element"> {{element.createdAt | date: 'medium'}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="failureItemsPerPage"
+                     [pageSize]="failureItemsPageSize"
+                     [length]="failureItemsLength"
+                     (page)="onFailurePageChanged($event)"
+                     showFirstLastButtons></mat-paginator>
+
+      <div *ngIf="failures.length === 0" class="no-entries-found">
+        <div>No entries found for this timeframe</div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

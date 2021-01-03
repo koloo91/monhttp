@@ -1,0 +1,7 @@
+<div id="dashboard-component">
+  <app-service-card *ngFor="let service of (services$ | async)"
+                    [service]="service"
+                    (cardClicked)="showServiceDetails($event)"
+                    class="service-card">
+  </app-service-card>
+</div>

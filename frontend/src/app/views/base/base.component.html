@@ -1,0 +1,19 @@
+<div id="base-component">
+  <mat-toolbar color="primary">
+    monhttp
+    <a mat-button [routerLink]="'/'"> Dashboard </a>
+    <a mat-button [routerLink]="'/services'"> Services </a>
+    <a mat-button [routerLink]="'/settings'"> Settings </a>
+
+    <span class="example-spacer"></span>
+
+    <button mat-icon-button (click)="logout()">
+      Logout
+    </button>
+
+  </mat-toolbar>
+
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

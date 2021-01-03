@@ -1,0 +1,24 @@
+#base-component {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .content {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    overflow: scroll;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 768px) {
+    .content {
+      max-width: 1012px;
+    }
+  }
+
+  .example-spacer {
+    flex: 1 1 auto;
+  }
+}

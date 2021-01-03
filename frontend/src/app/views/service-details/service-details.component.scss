@@ -1,0 +1,34 @@
+#service-details-component {
+
+  mat-card {
+    margin-top: 32px;
+  }
+
+  .service-statistics {
+    display: flex;
+    justify-content: space-evenly;
+
+    .statistic-column {
+      text-align: center;
+    }
+  }
+
+  .time-range-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 500px;
+  }
+
+  .no-entries-found {
+    text-align: center;
+  }
+
+  .failures-table {
+    width: 100%;
+  }
+}
