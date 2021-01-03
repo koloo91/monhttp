@@ -14,6 +14,10 @@ import (
 )
 
 func main() {
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
+
 	log.Info("Starting monhttp")
 
 	viper.SetConfigName("config")
