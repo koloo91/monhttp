@@ -34,9 +34,9 @@ jobs:
       run: git push origin --tags
     - name: Checkout develop
       run: git checkout develop
-    - name: Commit changes
-      run: git commit -m "Update to version $(cat version)"
     - name: Add changes
       run: git add version
+    - name: Commit changes
+      run: git commit -m "Update to version $(cat version)"
     - name: Push changes
       run: git push origin develop
