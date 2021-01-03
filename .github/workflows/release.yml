@@ -18,8 +18,6 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git fetch
-    - name: Increment version
-      run: ./increment_version.sh -m $(cat version) > version
     - name: Create git tag
       run: git tag -a $(cat version) -m "Release new version $(cat version)"
     - name: Build the Docker image
@@ -34,6 +32,8 @@ jobs:
       run: git push origin --tags
     - name: Checkout develop
       run: git checkout develop
+    - name: Increment version
+      run: ./increment_version.sh -m $(cat version) > version
     - name: Add changes
       run: git add version
     - name: Commit changes
