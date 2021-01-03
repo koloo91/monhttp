@@ -1,12 +1,10 @@
 NAME=monhttp
 VERSION=`cat version`
 
-REGISTRY=docker.pkg.github.com
-
 .PHONY: buildAndPushDockerImage
 buildAndPushDockerImage:
-	docker build -t $(REGISTRY)/koloo91/monhttp/monhttp:$(VERSION) -t $(REGISTRY)/koloo91/monhttp/monhttp:latest .
-	docker push --all-tags $(REGISTRY)/koloo91/monhttp/monhttp
+	docker build -t koloooo/monhttp:$(VERSION) -t koloooo/monhttp:latest .
+	docker push --all-tags koloooo/monhttp
 
 .PHONY: incrementReleaseVersion
 incrementReleaseVersion:

@@ -48,37 +48,39 @@ func getNextServiceIds() ([]string, error) {
 }
 
 func processService(serviceId string) {
-	processLogger := log.New().WithField("serviceId", serviceId)
+	processLogger := log.New()
+	processLogger.SetFormatter(&log.TextFormatter{})
+	logger := processLogger.WithField("serviceId", serviceId)
 
-	processLogger.Infof("Processing service with id: '%s'", serviceId)
+	logger.Infof("Processing service with id: '%s'", serviceId)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	tx, err := repository.BeginnTransaction()
 	if err != nil {
-		processLogger.Errorf("Unable to start transaction: '%s'", err)
+		logger.Errorf("Unable to start transaction: '%s'", err)
 		return
 	}
 
 	service, err := repository.SelectServiceByIdLocked(ctx, tx, serviceId)
 	if err != nil {
-		processLogger.Errorf("Unable to lock service: '%s'", err)
+		logger.Errorf("Unable to lock service: '%s'", err)
 		if err := tx.Rollback(); err != nil {
-			processLogger.Errorf("Error rolling back transaction: '%s'", err)
+			logger.Errorf("Error rolling back transaction: '%s'", err)
 		}
 		return
 	}
 
-	processLogger.Infof("Locked service '%s'", service.Name)
+	logger.Infof("Locked service '%s'", service.Name)
 
 	nextCheckTime := time.Now().Add(time.Duration(service.IntervalInSeconds) * time.Second)
-	processLogger.Infof("Set next check time of service '%s' to %s", service.Name, nextCheckTime.String())
+	logger.Infof("Set next check time of service '%s' to %s", service.Name, nextCheckTime.String())
 
 	if err := repository.UpdateServiceByIdNextCheckTime(ctx, tx, serviceId, nextCheckTime); err != nil {
-		processLogger.Errorf("Unable to update service '%s' next check time: '%s'", service.Name, err)
+		logger.Errorf("Unable to update service '%s' next check time: '%s'", service.Name, err)
 		if err := tx.Rollback(); err != nil {
-			processLogger.Errorf("Error rolling back transaction: '%s'", err)
+			logger.Errorf("Error rolling back transaction: '%s'", err)
 		}
 		return
 	}
@@ -89,28 +91,28 @@ func processService(serviceId string) {
 
 	switch service.Type {
 	case model.ServiceTypeHttp:
-		processLogger.Infof("Processing service '%s' as type HTTP", service.Name)
+		logger.Infof("Processing service '%s' as type HTTP", service.Name)
 		check, failure, checkErr = handleHttpServiceType(service)
 	case model.ServiceTypeIcmpPing:
-		processLogger.Infof("Processing service '%s' as type ICMP Ping", service.Name)
+		logger.Infof("Processing service '%s' as type ICMP Ping", service.Name)
 		check, failure, checkErr = handleIcmpPingServiceType(service)
 	default:
-		processLogger.Warnf("Unknown service type '%s'", service.Type)
+		logger.Warnf("Unknown service type '%s'", service.Type)
 	}
 
 	if checkErr != nil {
-		processLogger.Errorf("Error handling service type: '%s' - '%s'", service.Name, err)
+		logger.Errorf("Error handling service type: '%s' - '%s'", service.Name, err)
 		if err := tx.Rollback(); err != nil {
-			processLogger.Errorf("Error rolling back transaction: '%s'", err)
+			logger.Errorf("Error rolling back transaction: '%s'", err)
 		}
 		return
 	}
 
 	if check != nil {
 		if err := repository.InsertCheck(ctx, tx, *check); err != nil {
-			processLogger.Errorf("Unable to insert check for service '%s' - '%s'", service.Name, err)
+			logger.Errorf("Unable to insert check for service '%s' - '%s'", service.Name, err)
 			if err := tx.Rollback(); err != nil {
-				processLogger.Errorf("Error rolling back transaction: '%s'", err)
+				logger.Errorf("Error rolling back transaction: '%s'", err)
 			}
 			return
 		}
@@ -118,33 +120,33 @@ func processService(serviceId string) {
 
 	if failure != nil {
 		if service.EnableNotifications {
-			processLogger.Infof("Notifications for service '%s' enabled", service.Name)
+			logger.Infof("Notifications for service '%s' enabled", service.Name)
 			sendNotification, err := shouldSendNotification(ctx, tx, service)
 			if err != nil {
-				processLogger.Errorf("Unable to determine if we should send a notfication for service '%s' - '%s'", service.Name, err)
+				logger.Errorf("Unable to determine if we should send a notfication for service '%s' - '%s'", service.Name, err)
 				if err := tx.Rollback(); err != nil {
-					processLogger.Errorf("Error rolling back transaction: '%s'", err)
+					logger.Errorf("Error rolling back transaction: '%s'", err)
 				}
 				return
 			}
 
 			if sendNotification {
-				processLogger.Infof("Sending notification for service '%s'", service.Name)
+				logger.Infof("Sending notification for service '%s'", service.Name)
 				notificationSystem.AddNotification(notifier.NewNotification(service, *failure))
 			}
 		}
 
 		if err := repository.InsertFailure(ctx, tx, *failure); err != nil {
-			processLogger.Errorf("Unable to insert failure for service '%s' - '%s'", service.Name, err)
+			logger.Errorf("Unable to insert failure for service '%s' - '%s'", service.Name, err)
 			if err := tx.Rollback(); err != nil {
-				processLogger.Errorf("Error rolling back transaction: '%s'", err)
+				logger.Errorf("Error rolling back transaction: '%s'", err)
 			}
 			return
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		processLogger.Errorf("Error commiting transaction: '%s'", err)
+		logger.Errorf("Error commiting transaction: '%s'", err)
 	}
 }
 
