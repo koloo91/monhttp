@@ -15,8 +15,8 @@ incrementReleaseVersion:
 .PHONY: release
 release: incrementReleaseVersion buildAndPushDockerImage
 
-.PHONY: buildLocally
-buildLocally:
+.PHONY: buildLocal
+buildLocal:
 	rm -rf dist
 	$(MAKE) -C backend copyToDist
 	$(MAKE) -C frontend copyToDist

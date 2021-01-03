@@ -48,9 +48,7 @@ func getNextServiceIds() ([]string, error) {
 }
 
 func processService(serviceId string) {
-	processLogger := log.New()
-	processLogger.SetFormatter(&log.TextFormatter{})
-	logger := processLogger.WithField("serviceId", serviceId)
+	logger := log.WithField("serviceId", serviceId)
 
 	logger.Infof("Processing service with id: '%s'", serviceId)
 
@@ -264,12 +262,12 @@ func handleIcmpPingServiceType(service model.Service) (*model.Check, *model.Fail
 	outputString := string(outputBytes)
 	if strings.Contains(outputString, "Unknown host") {
 		failure := model.NewFailure(service.Id, "unknown host")
-		return nil, failure, nil
+		return model.NewCheck(service.Id, 0, true), failure, nil
 	}
 
 	if strings.Contains(outputString, "100.0% packet loss") {
 		failure := model.NewFailure(service.Id, "destination host unreachable")
-		return nil, failure, nil
+		return model.NewCheck(service.Id, 0, true), failure, nil
 	}
 
 	r := regexp.MustCompile(`time=(.*) ms`)

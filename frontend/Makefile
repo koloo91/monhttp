@@ -3,7 +3,7 @@ build:
 
 copyToDist: build
 	mkdir -p ../dist/public
-	cp -r dist/ ../dist/public/
+	cp -r dist/monhttp/ ../dist/public/
 
 clean:
 	rm -rf dist
