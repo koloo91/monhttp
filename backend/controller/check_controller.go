@@ -18,20 +18,21 @@ func getChecks(ctx *gin.Context) {
 
 	from, err := time.Parse(time.RFC3339, fromString)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Unable to parse from date '%s' - '%s'", fromString, err)
 		ctx.JSON(http.StatusBadRequest, toApiError(fmt.Errorf("date must be in format '%s'", time.RFC3339)))
 		return
 	}
 
 	to, err := time.Parse(time.RFC3339, toString)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Unable to parse to date '%s' - '%s'", toString, err)
 		ctx.JSON(http.StatusBadRequest, toApiError(fmt.Errorf("date must be in format '%s'", time.RFC3339)))
 		return
 	}
 
 	checks, err := service.GetChecks(ctx.Request.Context(), serviceId, from, to)
 	if err != nil {
+		log.Errorf("Unable to get checks from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}
@@ -45,6 +46,7 @@ func getAverage(ctx *gin.Context) {
 
 	average, err := service.GetAverageValues(ctx.Request.Context(), serviceId)
 	if err != nil {
+		log.Errorf("Unable to get average values from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}
@@ -58,6 +60,7 @@ func getIsOnline(ctx *gin.Context) {
 
 	isOnline, err := service.GetIsOnline(ctx.Request.Context(), serviceId)
 	if err != nil {
+		log.Errorf("Unable to get is online value from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}

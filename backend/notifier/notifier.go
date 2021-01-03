@@ -21,16 +21,18 @@ func NewNotificationSystem() *NotificationSystem {
 }
 
 func (n *NotificationSystem) SetupDefaultNotifier() {
+	log.Info("Setting up default notifiers")
 	n.notifiers = make([]model.Notify, 0)
 
 	load := func() {
+		log.Info("Adding notifiers")
 		n.notifiers = append(n.notifiers, NewEMailNotifier())
 		n.notifiers = append(n.notifiers, NewTelegramNotifier())
 	}
 	load()
 
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		log.Println("Config files changed: ", in.Name)
+		log.Info("Config file changed: ", in.Name)
 		// reset notifiers
 		n.notifiers = make([]model.Notify, 0)
 		load()
@@ -43,7 +45,7 @@ func (n *NotificationSystem) Start() {
 			for _, notifier := range n.getEnabledNotifiers() {
 				log.Printf("Sending notification using '%s' notifier", notifier.GetId())
 				if err := notifier.SendFailure(notification.Service, notification.Failure); err != nil {
-					log.Error(err)
+					log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
 				}
 			}
 		}

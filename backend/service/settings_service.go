@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/koloo91/monhttp/model"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -30,11 +31,13 @@ func UpdateSettings(settings model.SettingsVo) error {
 	viper.Set("users", []string{fmt.Sprintf("%s:%s", settings.Username, settings.Password)})
 
 	if err := LoadDatabase(); err != nil {
+		log.Errorf("Unable to load database with configuration: '%s'", err)
 		return err
 	}
 
 	onAdminSetCallback(settings.Username, settings.Password)
 
+	log.Info("Writing new settings into config.yml")
 	return viper.WriteConfigAs("./config/config.yml")
 }
 
