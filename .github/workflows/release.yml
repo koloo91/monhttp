@@ -21,7 +21,7 @@ jobs:
     - name: Create git tag
       run: git tag -a $(cat version) -m "Release new version $(cat version)"
     - name: Set version env
-      run: echo "$(cat version)" >> $VERSION
+      run: echo "VERSION=$(cat version)" >> $GITHUB_ENV
     - name: Build the Docker image
       run: docker build -t koloooo/monhttp:$(cat version) -t koloooo/monhttp:latest .
     - name: Publish to Registry
