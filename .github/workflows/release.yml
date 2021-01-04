@@ -20,6 +20,8 @@ jobs:
         git fetch
     - name: Create git tag
       run: git tag -a $(cat version) -m "Release new version $(cat version)"
+      env:
+        VERSION: $(cat version)
     - name: Build the Docker image
       run: docker build -t koloooo/monhttp:$(cat version) -t koloooo/monhttp:latest .
     - name: Publish to Registry
@@ -28,7 +30,7 @@ jobs:
         name: koloooo/monhttp
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        tags: "latest,$(cat version)"
+        tags: "latest,${{ env.VERSION }}"
     - name: Push tag
       run: git push origin --tags
     - name: Checkout develop
