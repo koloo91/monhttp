@@ -26,6 +26,7 @@ func main() {
 	viper.WatchConfig()
 
 	viper.SetDefault("server.port", 8081)
+	viper.SetDefault("scheduler.numberOfWorkers", 5)
 
 	service.SetIsSetup(true)
 

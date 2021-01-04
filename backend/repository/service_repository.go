@@ -8,23 +8,26 @@ import (
 	"time"
 )
 
+const (
+	insertServiceQuery = `INSERT INTO service (id, name, type, interval_in_seconds, endpoint, http_method,
+											 request_timeout_in_seconds, http_headers, http_body, expected_http_response_body,
+											 expected_http_status_code, follow_redirects, verify_ssl, enable_notifications,
+											 notify_after_number_of_failures, continuously_send_notifications, created_at, updated_at)
+						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);`
+)
+
 var (
-	insertServiceStatement            *sql.Stmt
-	selectServicesStatement           *sql.Stmt
-	selectServiceByIdStatement        *sql.Stmt
-	updateServiceByIdStatement        *sql.Stmt
-	deleteServiceByIdStatement        *sql.Stmt
-	getNextScheduledServicesStatement *sql.Stmt
+	insertServiceStatement     *sql.Stmt
+	selectServicesStatement    *sql.Stmt
+	selectServiceByIdStatement *sql.Stmt
+	updateServiceByIdStatement *sql.Stmt
+	deleteServiceByIdStatement *sql.Stmt
 )
 
 func prepareServiceStatements() {
 	var err error
 
-	insertServiceStatement, err = db.Prepare(`INSERT INTO service (id, name, type, interval_in_seconds, next_check_time, endpoint, http_method,
-											 request_timeout_in_seconds, http_headers, http_body, expected_http_response_body,
-											 expected_http_status_code, follow_redirects, verify_ssl, enable_notifications,
-											 notify_after_number_of_failures, continuously_send_notifications, created_at, updated_at)
-						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19);`)
+	insertServiceStatement, err = db.Prepare(insertServiceQuery)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +36,6 @@ func prepareServiceStatements() {
 															   name,
 															   type,
 															   interval_in_seconds,
-															   next_check_time,
 															   endpoint,
 															   http_method,
 															   request_timeout_in_seconds,
@@ -57,7 +59,6 @@ func prepareServiceStatements() {
 															   name,
 															   type,
 															   interval_in_seconds,
-															   next_check_time,
 															   endpoint,
 															   http_method,
 															   request_timeout_in_seconds,
@@ -81,20 +82,19 @@ func prepareServiceStatements() {
 														SET name=$2,
 															type=$3,
 															interval_in_seconds=$4,
-															next_check_time=$5,
-															endpoint=$6,
-															http_method=$7,
-															request_timeout_in_seconds=$8,
-															http_headers=$9,
-															http_body=$10,
-															expected_http_response_body=$11,
-															expected_http_status_code=$12,
-															follow_redirects=$13,
-															verify_ssl=$14,
-															enable_notifications=$15,
-															notify_after_number_of_failures=$16,
-														    continuously_send_notifications=$17,
-															updated_at=$18
+															endpoint=$5,
+															http_method=$6,
+															request_timeout_in_seconds=$7,
+															http_headers=$8,
+															http_body=$9,
+															expected_http_response_body=$10,
+															expected_http_status_code=$11,
+															follow_redirects=$12,
+															verify_ssl=$13,
+															enable_notifications=$14,
+															notify_after_number_of_failures=$15,
+														    continuously_send_notifications=$16,
+															updated_at=$17
 														WHERE id = $1;`)
 	if err != nil {
 		log.Fatal(err)
@@ -106,13 +106,23 @@ func prepareServiceStatements() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	getNextScheduledServicesStatement, err = db.Prepare(`SELECT id FROM service WHERE next_check_time <= now();`)
 }
 
 func InsertService(ctx context.Context, service model.Service) error {
 	if _, err := insertServiceStatement.ExecContext(ctx,
-		service.Id, service.Name, service.Type, service.IntervalInSeconds, service.NextCheckTime, service.Endpoint, service.HttpMethod,
+		service.Id, service.Name, service.Type, service.IntervalInSeconds, service.Endpoint, service.HttpMethod,
+		service.RequestTimeoutInSeconds, service.HttpHeaders, service.HttpBody, service.ExpectedHttpResponseBody,
+		service.ExpectedHttpStatusCode, service.FollowRedirects, service.VerifySsl, service.EnableNotifications,
+		service.NotifyAfterNumberOfFailures, service.ContinuouslySendNotifications, service.CreatedAt, service.UpdatedAt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertServiceTx(ctx context.Context, tx *sql.Tx, service model.Service) error {
+	if _, err := tx.ExecContext(ctx, insertServiceQuery,
+		service.Id, service.Name, service.Type, service.IntervalInSeconds, service.Endpoint, service.HttpMethod,
 		service.RequestTimeoutInSeconds, service.HttpHeaders, service.HttpBody, service.ExpectedHttpResponseBody,
 		service.ExpectedHttpStatusCode, service.FollowRedirects, service.VerifySsl, service.EnableNotifications,
 		service.NotifyAfterNumberOfFailures, service.ContinuouslySendNotifications, service.CreatedAt, service.UpdatedAt); err != nil {
@@ -135,12 +145,12 @@ func SelectServices(ctx context.Context) ([]model.Service, error) {
 	var serviceType model.ServiceType
 	var intervalInSeconds, requestTimeoutInSeconds, expectedHttpStatusCode, notifyAfterNumberOfFailures int
 	var followRedirects, verifySsl, enableNotifications, continuouslySendNotifications bool
-	var nextCheckTime, createdAt, updatedAt time.Time
+	var createdAt, updatedAt time.Time
 
 	result := make([]model.Service, 0)
 
 	for rows.Next() {
-		if err := rows.Scan(&id, &name, &serviceType, &intervalInSeconds, &nextCheckTime, &endpoint, &httpMethod,
+		if err := rows.Scan(&id, &name, &serviceType, &intervalInSeconds, &endpoint, &httpMethod,
 			&requestTimeoutInSeconds, &httpHeaders, &httpBody, &expectedHttpResponseBody,
 			&expectedHttpStatusCode, &followRedirects, &verifySsl, &enableNotifications,
 			&notifyAfterNumberOfFailures, &continuouslySendNotifications, &createdAt, &updatedAt); err != nil {
@@ -152,7 +162,6 @@ func SelectServices(ctx context.Context) ([]model.Service, error) {
 			Name:                          name,
 			Type:                          serviceType,
 			IntervalInSeconds:             intervalInSeconds,
-			NextCheckTime:                 nextCheckTime,
 			Endpoint:                      endpoint,
 			HttpMethod:                    httpMethod,
 			RequestTimeoutInSeconds:       requestTimeoutInSeconds,
@@ -180,9 +189,9 @@ func SelectServiceById(ctx context.Context, serviceId string) (model.Service, er
 	var serviceType model.ServiceType
 	var intervalInSeconds, requestTimeoutInSeconds, expectedHttpStatusCode, notifyAfterNumberOfFailures int
 	var followRedirects, verifySsl, enableNotifications, continuouslySendNotifications bool
-	var nextCheckTime, createdAt, updatedAt time.Time
+	var createdAt, updatedAt time.Time
 
-	if err := row.Scan(&id, &name, &serviceType, &intervalInSeconds, &nextCheckTime, &endpoint, &httpMethod,
+	if err := row.Scan(&id, &name, &serviceType, &intervalInSeconds, &endpoint, &httpMethod,
 		&requestTimeoutInSeconds, &httpHeaders, &httpBody, &expectedHttpResponseBody,
 		&expectedHttpStatusCode, &followRedirects, &verifySsl, &enableNotifications,
 		&notifyAfterNumberOfFailures, &continuouslySendNotifications, &createdAt, &updatedAt); err != nil {
@@ -194,66 +203,6 @@ func SelectServiceById(ctx context.Context, serviceId string) (model.Service, er
 		Name:                          name,
 		Type:                          serviceType,
 		IntervalInSeconds:             intervalInSeconds,
-		NextCheckTime:                 nextCheckTime,
-		Endpoint:                      endpoint,
-		HttpMethod:                    httpMethod,
-		RequestTimeoutInSeconds:       requestTimeoutInSeconds,
-		HttpHeaders:                   httpHeaders,
-		HttpBody:                      httpBody,
-		ExpectedHttpResponseBody:      expectedHttpResponseBody,
-		ExpectedHttpStatusCode:        expectedHttpStatusCode,
-		FollowRedirects:               followRedirects,
-		VerifySsl:                     verifySsl,
-		EnableNotifications:           enableNotifications,
-		NotifyAfterNumberOfFailures:   notifyAfterNumberOfFailures,
-		ContinuouslySendNotifications: continuouslySendNotifications,
-		CreatedAt:                     createdAt,
-		UpdatedAt:                     updatedAt,
-	}, nil
-}
-
-func SelectServiceByIdLocked(ctx context.Context, tx *sql.Tx, serviceId string) (model.Service, error) {
-	row := tx.QueryRowContext(ctx, `SELECT id,
-												   name,
-												   type,
-												   interval_in_seconds,
-												   next_check_time,
-												   endpoint,
-												   http_method,
-												   request_timeout_in_seconds,
-												   http_headers,
-												   http_body,
-												   expected_http_response_body,
-												   expected_http_status_code,
-												   follow_redirects,
-												   verify_ssl,
-												   enable_notifications,
-												   notify_after_number_of_failures,
-       											   continuously_send_notifications,
-												   created_at,
-												   updated_at
-											FROM service WHERE id = $1 
-											FOR UPDATE;`, serviceId)
-
-	var id, name, endpoint, httpMethod, httpHeaders, httpBody, expectedHttpResponseBody string
-	var serviceType model.ServiceType
-	var intervalInSeconds, requestTimeoutInSeconds, expectedHttpStatusCode, notifyAfterNumberOfFailures int
-	var followRedirects, verifySsl, enableNotifications, continuouslySendNotifications bool
-	var nextCheckTime, createdAt, updatedAt time.Time
-
-	if err := row.Scan(&id, &name, &serviceType, &intervalInSeconds, &nextCheckTime, &endpoint, &httpMethod,
-		&requestTimeoutInSeconds, &httpHeaders, &httpBody, &expectedHttpResponseBody,
-		&expectedHttpStatusCode, &followRedirects, &verifySsl, &enableNotifications,
-		&notifyAfterNumberOfFailures, &continuouslySendNotifications, &createdAt, &updatedAt); err != nil {
-		return model.Service{}, err
-	}
-
-	return model.Service{
-		Id:                            id,
-		Name:                          name,
-		Type:                          serviceType,
-		IntervalInSeconds:             intervalInSeconds,
-		NextCheckTime:                 nextCheckTime,
 		Endpoint:                      endpoint,
 		HttpMethod:                    httpMethod,
 		RequestTimeoutInSeconds:       requestTimeoutInSeconds,
@@ -272,18 +221,10 @@ func SelectServiceByIdLocked(ctx context.Context, tx *sql.Tx, serviceId string) 
 }
 
 func UpdateServiceById(ctx context.Context, serviceId string, service model.Service) error {
-	if _, err := updateServiceByIdStatement.ExecContext(ctx, serviceId, service.Name, service.Type, service.IntervalInSeconds, service.NextCheckTime, service.Endpoint, service.HttpMethod,
+	if _, err := updateServiceByIdStatement.ExecContext(ctx, serviceId, service.Name, service.Type, service.IntervalInSeconds, service.Endpoint, service.HttpMethod,
 		service.RequestTimeoutInSeconds, service.HttpHeaders, service.HttpBody, service.ExpectedHttpResponseBody,
 		service.ExpectedHttpStatusCode, service.FollowRedirects, service.VerifySsl, service.EnableNotifications,
 		service.NotifyAfterNumberOfFailures, service.ContinuouslySendNotifications, time.Now()); err != nil {
-		return err
-	}
-	return nil
-}
-
-func UpdateServiceByIdNextCheckTime(ctx context.Context, tx *sql.Tx, serviceId string, nextCheckTime time.Time) error {
-	if _, err := tx.ExecContext(ctx, `UPDATE service SET next_check_time = $2 WHERE id = $1;`,
-		serviceId, nextCheckTime); err != nil {
 		return err
 	}
 	return nil
@@ -294,26 +235,4 @@ func DeleteServiceById(ctx context.Context, serviceId string) error {
 		return err
 	}
 	return nil
-}
-
-func GetNextScheduledServiceIds(ctx context.Context) ([]string, error) {
-	rows, err := getNextScheduledServicesStatement.QueryContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var id string
-
-	result := make([]string, 0)
-
-	for rows.Next() {
-		if err := rows.Scan(&id); err != nil {
-			return nil, err
-		}
-
-		result = append(result, id)
-	}
-
-	return result, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/koloo91/monhttp/notifier"
 	"github.com/koloo91/monhttp/repository"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
@@ -21,36 +22,50 @@ import (
 func StartScheduleJob() {
 	log.Info("Starting job scheduler")
 
+	jobIds := make(chan string, 1024)
+
+	for w := 1; w <= viper.GetInt("scheduler.numberOfWorkers"); w++ {
+		go worker(w, jobIds)
+	}
+
 	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
-		go startCheckProcess()
+		go startCheckProcess(jobIds)
 	}
 }
 
-func startCheckProcess() {
-	log.Info("Looking for next services to process")
-	serviceIds, err := getNextServiceIds()
+func startCheckProcess(jobIdsChannel chan string) {
+	log.Info("Looking for next jobs to process")
+	jobIds, err := getNextJobIds()
 	if err != nil {
-		log.Errorf("Unable to get next service ids to process '%s'", err)
+		log.Errorf("Unable to get next job ids to process '%s'", err)
 		return
 	}
 
-	for _, service := range serviceIds {
-		go processService(service)
+	log.Infof("Found %d jobs", len(jobIds))
+	for _, jobId := range jobIds {
+		jobIdsChannel <- jobId
 	}
-
 }
 
-func getNextServiceIds() ([]string, error) {
+func worker(workerId int, jobIds <-chan string) {
+	log.Infof("Starting worker with id '%d'", workerId)
+
+	for jobId := range jobIds {
+		processService(workerId, jobId)
+	}
+}
+
+func getNextJobIds() ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	return repository.GetNextScheduledServiceIds(ctx)
+	return repository.GetNextJobIds(ctx)
 }
 
-func processService(serviceId string) {
-	logger := log.WithField("serviceId", serviceId)
+func processService(workerId int, jobId string) {
+	logger := log.WithFields(log.Fields{"jobId": jobId, "workerId": workerId})
 
-	logger.Infof("Processing service with id: '%s'", serviceId)
+	logger.Infof("Processing job with id: '%s'", jobId)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
@@ -61,22 +76,31 @@ func processService(serviceId string) {
 		return
 	}
 
-	service, err := repository.SelectServiceByIdLocked(ctx, tx, serviceId)
+	job, err := repository.SelectJobByIdLockedTx(ctx, tx, jobId)
 	if err != nil {
-		logger.Errorf("Unable to lock service: '%s'", err)
+		logger.Errorf("Unable to lock job: '%s'", err)
 		if err := tx.Rollback(); err != nil {
 			logger.Errorf("Error rolling back transaction: '%s'", err)
 		}
 		return
 	}
 
-	logger.Infof("Locked service '%s'", service.Name)
+	logger.Info("Locked job")
 
-	nextCheckTime := time.Now().Add(time.Duration(service.IntervalInSeconds) * time.Second)
-	logger.Infof("Set next check time of service '%s' to %s", service.Name, nextCheckTime.String())
+	service, err := repository.SelectServiceById(ctx, job.ServiceId)
+	if err != nil {
+		logger.Errorf("Unable to get service with id '%s' - '%s'", job.ServiceId, err)
+		if err := tx.Rollback(); err != nil {
+			logger.Errorf("Error rolling back transaction: '%s'", err)
+		}
+		return
+	}
 
-	if err := repository.UpdateServiceByIdNextCheckTime(ctx, tx, serviceId, nextCheckTime); err != nil {
-		logger.Errorf("Unable to update service '%s' next check time: '%s'", service.Name, err)
+	executeAt := time.Now().Add(time.Duration(service.IntervalInSeconds) * time.Second)
+	logger.Infof("Set next check time of service '%s' to %s", service.Name, executeAt.String())
+
+	if err := repository.UpdateJobByIdExecuteAtTx(ctx, tx, jobId, executeAt); err != nil {
+		logger.Errorf("Unable to update job '%s' execute at time: '%s'", service.Name, err)
 		if err := tx.Rollback(); err != nil {
 			logger.Errorf("Error rolling back transaction: '%s'", err)
 		}

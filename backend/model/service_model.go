@@ -17,7 +17,6 @@ type Service struct {
 	Name                          string
 	Type                          ServiceType
 	IntervalInSeconds             int
-	NextCheckTime                 time.Time
 	Endpoint                      string
 	HttpMethod                    string
 	RequestTimeoutInSeconds       int
@@ -39,7 +38,6 @@ type ServiceVo struct {
 	Name                          string      `json:"name"`
 	Type                          ServiceType `json:"type"`
 	IntervalInSeconds             int         `json:"intervalInSeconds"`
-	NextCheckTime                 time.Time   `json:"nextCheckTime"`
 	Endpoint                      string      `json:"endpoint"`
 	HttpMethod                    string      `json:"httpMethod"`
 	RequestTimeoutInSeconds       int         `json:"requestTimeoutInSeconds"`
@@ -62,7 +60,6 @@ func MapServiceVoToEntity(vo ServiceVo) Service {
 		Name:                          vo.Name,
 		Type:                          vo.Type,
 		IntervalInSeconds:             vo.IntervalInSeconds,
-		NextCheckTime:                 time.Now(),
 		Endpoint:                      vo.Endpoint,
 		HttpMethod:                    vo.HttpMethod,
 		RequestTimeoutInSeconds:       vo.RequestTimeoutInSeconds,
@@ -86,7 +83,6 @@ func MapServiceEntityToVo(entity Service) ServiceVo {
 		Name:                          entity.Name,
 		Type:                          entity.Type,
 		IntervalInSeconds:             entity.IntervalInSeconds,
-		NextCheckTime:                 entity.NextCheckTime,
 		Endpoint:                      entity.Endpoint,
 		HttpMethod:                    entity.HttpMethod,
 		RequestTimeoutInSeconds:       entity.RequestTimeoutInSeconds,

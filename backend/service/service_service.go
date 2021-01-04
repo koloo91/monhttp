@@ -7,6 +7,29 @@ import (
 )
 
 func CreateService(ctx context.Context, service model.Service) (model.Service, error) {
+	tx, err := repository.BeginnTransaction()
+	if err != nil {
+		return model.Service{}, err
+	}
+
+	if err := repository.InsertServiceTx(ctx, tx, service); err != nil {
+		if err := tx.Rollback(); err != nil {
+			return model.Service{}, err
+		}
+		return model.Service{}, err
+	}
+
+	if err := repository.InsertJobTx(ctx, tx, model.NewJob(service.Id)); err != nil {
+		if err := tx.Rollback(); err != nil {
+			return model.Service{}, nil
+		}
+		return model.Service{}, nil
+	}
+
+	if err := tx.Commit(); err != nil {
+		return model.Service{}, err
+	}
+
 	return service, repository.InsertService(ctx, service)
 }
 
