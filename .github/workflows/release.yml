@@ -20,8 +20,8 @@ jobs:
         git fetch
     - name: Create git tag
       run: git tag -a $(cat version) -m "Release new version $(cat version)"
-      env:
-        VERSION: $(cat version)
+    - name: Set version env
+      run: $(cat version) >> $VERSION
     - name: Build the Docker image
       run: docker build -t koloooo/monhttp:$(cat version) -t koloooo/monhttp:latest .
     - name: Publish to Registry
