@@ -82,10 +82,33 @@
           [showYAxisLabel]="true"
           [autoScale]="true"
           [trimXAxisTicks]="false"
+          [scheme]="chartDataColorScheme"
           [results]="chartData">
         </ngx-charts-line-chart>
       </div>
       <div *ngIf="checks.length === 0" class="no-entries-found">
+        <div>No entries found for this timeframe</div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Service failures by day</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container" *ngIf="failures.length !== 0">
+        <ngx-charts-bar-vertical
+          [xAxis]="true"
+          [yAxis]="true"
+          [yAxisLabel]="'Date'"
+          [showYAxisLabel]="true"
+          [trimXAxisTicks]="false"
+          [scheme]="failuresColorScheme"
+          [results]="failuresCountByDayChartData">
+        </ngx-charts-bar-vertical>
+      </div>
+      <div *ngIf="failures.length === 0" class="no-entries-found">
         <div>No entries found for this timeframe</div>
       </div>
     </mat-card-content>
@@ -111,7 +134,8 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <mat-paginator [pageSizeOptions]="failureItemsPerPage"
+      <mat-paginator *ngIf="failures.length !== 0"
+                     [pageSizeOptions]="failureItemsPerPage"
                      [pageSize]="failureItemsPageSize"
                      [length]="failureItemsLength"
                      (page)="onFailurePageChanged($event)"

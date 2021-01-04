@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	selectFailuresByServiceIdAndCreateAtStatement      *sql.Stmt
-	selectFailuresCountByServiceIdAnCreatedAtStatement *sql.Stmt
+	selectFailuresByServiceIdAndCreateAtStatement              *sql.Stmt
+	selectFailuresCountByServiceIdAnCreatedAtStatement         *sql.Stmt
+	selectFailuresCountByServiceIdAndGroupByCreatedAtStatement *sql.Stmt
 )
 
 func prepareFailureStatements() {
@@ -36,6 +37,19 @@ func prepareFailureStatements() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	selectFailuresCountByServiceIdAndGroupByCreatedAtStatement, err = db.Prepare(`SELECT generated.day, COALESCE(failure.count, 0)
+																							FROM (
+																									 SELECT date_trunc('day', dd)::date as day, 0 as count
+																									 FROM generate_series($2::timestamptz, $3::timestamptz,
+																														  '1 day'::interval) dd) as generated
+																									 LEFT JOIN (SELECT date_trunc('day', created_at)::date as day, COUNT(*) as count
+																												FROM failure
+																												WHERE service_id = $1
+																												  AND created_at >= $2
+																												  AND created_at <= $3
+																												GROUP BY 1
+																												ORDER BY 1) as failure ON generated.day = failure.day;`)
 }
 
 func InsertFailure(ctx context.Context, tx *sql.Tx, failure model.Failure) error {
@@ -85,4 +99,31 @@ func SelectFailuresCount(ctx context.Context, serviceId string, from, to time.Ti
 	}
 
 	return count, nil
+}
+
+func SelectFailuresGroupedByDay(ctx context.Context, serviceId string, from, to time.Time) ([]model.FailureCountByDay, error) {
+	rows, err := selectFailuresCountByServiceIdAndGroupByCreatedAtStatement.QueryContext(ctx, serviceId, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var day time.Time
+	var count int
+
+	result := make([]model.FailureCountByDay, 0)
+
+	for rows.Next() {
+		if err := rows.Scan(&day, &count); err != nil {
+			return nil, err
+		}
+
+		result = append(result, model.FailureCountByDay{
+			Day:   day,
+			Count: count,
+		})
+	}
+
+	return result, nil
 }

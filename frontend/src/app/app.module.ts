@@ -38,6 +38,8 @@ import {SetupComponent} from './views/setup/setup.component';
 import {LoginComponent} from './views/login/login.component';
 import {TokenInterceptor} from './http_interceptor/token.interceptor';
 import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
@@ -79,7 +81,8 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     NgxMatDatetimePickerModule,
     MatDatepickerModule,
     NgxMatNativeDateModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatProgressBarModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},

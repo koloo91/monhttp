@@ -15,3 +15,7 @@ func GetFailuresCount(ctx context.Context, serviceId string, from, to time.Time)
 	count, err := repository.SelectFailuresCount(ctx, serviceId, from, to)
 	return model.FailureCount{Count: count}, err
 }
+
+func GetFailuresGroupedByDay(ctx context.Context, serviceId string, from, to time.Time) ([]model.FailureCountByDay, error) {
+	return repository.SelectFailuresGroupedByDay(ctx, serviceId, from, to.Add(1*time.Second))
+}

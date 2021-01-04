@@ -3,7 +3,7 @@ import {Service} from '../../models/service.model';
 import {CheckService} from '../../services/check.service';
 import {Observable} from 'rxjs';
 import {Average} from '../../models/average.model';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {Check} from '../../models/check.model';
 import {IsOnline} from '../../models/is-online.model';
 
@@ -25,22 +25,43 @@ export class ServiceCardComponent implements OnInit {
 
   checks: Check[] = [];
   chartData: any = [];
+  chartColorScheme = {
+    domain: ['#000']
+  };
 
   cardWidth: number;
+
+  isLoading = false;
 
   constructor(private checkService: CheckService) {
   }
 
   ngOnInit(): void {
+    this.isLoading = true;
+
     this.average$ = this.checkService.average(this.service.id);
-    this.isOnline$ = this.checkService.isOnline(this.service.id);
+    this.isOnline$ = this.checkService.isOnline(this.service.id)
+      .pipe(
+        tap(isOnline => {
+          if (isOnline.online) {
+            this.chartColorScheme = {
+              domain: ['#28a745']
+            };
+          } else {
+            this.chartColorScheme = {
+              domain: ['#dd3545']
+            };
+          }
+        })
+      );
 
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
     this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString())
       .pipe(
-        map(checks => checks.reverse())
+        map(checks => checks.reverse()),
+        tap(() => this.isLoading = false)
       )
       .subscribe(checks => {
         this.checks = checks;
@@ -52,7 +73,6 @@ export class ServiceCardComponent implements OnInit {
         }]
 
       }, console.log)
-
   }
 
   onCardClicked() {

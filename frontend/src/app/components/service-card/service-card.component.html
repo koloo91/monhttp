@@ -17,19 +17,27 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="chart-container">
-        <ngx-charts-line-chart
-          *ngIf="checks.length !== 0"
-          [xAxis]="false"
-          [yAxis]="true"
-          [showXAxisLabel]="false"
-          [showYAxisLabel]="false"
-          [autoScale]="true"
-          [legend]="false"
-          [results]="chartData">
-        </ngx-charts-line-chart>
-        <div *ngIf="checks.length === 0" class="no-entries-found">
-          <div>No entries found</div>
+
+      <div style="height: 200px">
+        <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+
+        <div *ngIf="!isLoading">
+          <div class="chart-container">
+            <ngx-charts-line-chart
+              *ngIf="checks.length !== 0"
+              [xAxis]="false"
+              [yAxis]="true"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="false"
+              [autoScale]="true"
+              [legend]="false"
+              [scheme]="chartColorScheme"
+              [results]="chartData">
+            </ngx-charts-line-chart>
+            <div *ngIf="checks.length === 0" class="no-entries-found">
+              <div>No entries found</div>
+            </div>
+          </div>
         </div>
       </div>
     </mat-card-content>

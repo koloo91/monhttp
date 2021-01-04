@@ -17,6 +17,11 @@ type GetFailuresQueryParameter struct {
 	To       *time.Time `form:"to" binding:"required"`
 }
 
+type GetFailuresGroupedByDayQueryParameter struct {
+	From *time.Time `form:"from" binding:"required"`
+	To   *time.Time `form:"to" binding:"required"`
+}
+
 func getFailures(ctx *gin.Context) {
 	serviceId := ctx.Param("id")
 
@@ -78,4 +83,24 @@ func getFailureCount(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, model.MapFailureCountEntityToVo(failureCount))
+}
+
+func getFailuresGroupedByDay(ctx *gin.Context) {
+	serviceId := ctx.Param("id")
+
+	var queryParameter GetFailuresGroupedByDayQueryParameter
+	if err := ctx.ShouldBindQuery(&queryParameter); err != nil {
+		log.Errorf("Unable to get query parameter: '%s'", err)
+		ctx.JSON(http.StatusBadRequest, toApiError(err))
+		return
+	}
+
+	countsPerDay, err := service.GetFailuresGroupedByDay(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To)
+	if err != nil {
+		log.Errorf("Unable to get is failures count by day from database: '%s'", err)
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": model.MapFailureCountByDayEntitiesToVos(countsPerDay)})
 }

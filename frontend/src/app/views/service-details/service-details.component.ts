@@ -38,6 +38,11 @@ export class ServiceDetailsComponent implements OnInit {
   failures: Failure[] = [];
 
   chartData: any;
+  chartDataColorScheme = {
+    domain: ['#28a745']
+  };
+
+  failuresCountByDayChartData: any;
 
   timeIntervals = [
     {
@@ -102,6 +107,9 @@ export class ServiceDetailsComponent implements OnInit {
     pageIndex: 0
   });
   failurePaginatorEvent$: Observable<PageEvent>;
+  failuresColorScheme: any = {
+    domain: ['#dd3545']
+  };
 
   constructor(private serviceService: ServiceService,
               private checkService: CheckService,
@@ -134,6 +142,7 @@ export class ServiceDetailsComponent implements OnInit {
     yesterday.setDate(yesterday.getDate() - 1);
 
     this.loadChartData();
+
     combineLatest([this.route.params, this.dateTimeRangeFormGroup.valueChanges, this.failurePaginatorEvent$])
       .pipe(
         map(([params, formValues, pageEvent]) => [params['id'], formValues, pageEvent]),
@@ -167,6 +176,20 @@ export class ServiceDetailsComponent implements OnInit {
             return {name: new Date(check.createdAt).toLocaleString(), value: check.latencyInMs};
           })
         }]
+      });
+
+    combineLatest([this.route.params, this.dateTimeRangeFormGroup.valueChanges])
+      .pipe(
+        map(([params, formValues]) => [params['id'] as string, formValues]),
+        switchMap(([id, {
+          fromDateTime,
+          toDateTime
+        }]) => this.failureService.countByDay(id, fromDateTime.toISOString(), toDateTime.toISOString())),
+      )
+      .subscribe(failuresCountByDay => {
+        this.failuresCountByDayChartData = failuresCountByDay.map(d => {
+          return {name: new Date(d.day).toLocaleDateString(), value: d.count}
+        })
       });
   }
 
