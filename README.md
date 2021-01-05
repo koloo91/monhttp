@@ -13,7 +13,7 @@ monhttp can notify you via email or Telegram when a service is unavailable. More
 
 ## Run on Docker
 
-Use the official Docker image to run monhttp in seconds.
+Use the [official Docker image](https://hub.docker.com/r/koloooo/monhttp) to run monhttp in seconds.
 
 ``` shell
 docker run -p 8081:8081 koloooo/monhttp
