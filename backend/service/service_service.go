@@ -30,7 +30,7 @@ func CreateService(ctx context.Context, service model.Service) (model.Service, e
 		return model.Service{}, err
 	}
 
-	return service, repository.InsertService(ctx, service)
+	return service, nil
 }
 
 func GetServices(ctx context.Context) ([]model.Service, error) {

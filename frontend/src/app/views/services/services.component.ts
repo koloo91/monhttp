@@ -101,11 +101,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.dataSource$ = this.serviceService.delete(service.id)
+      this.serviceService.delete(service.id)
         .pipe(
-          switchMap(() => this.serviceService.list()),
-          map(services => services as ServiceWithStatusAndFailures[])
-        );
+          tap(() => this.loadServices())
+        ).subscribe();
     })
   }
 
