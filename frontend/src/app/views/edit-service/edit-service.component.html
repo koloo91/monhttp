@@ -1,4 +1,6 @@
 <div id="edit-service-component">
+  <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+
   <form [formGroup]="formGroup" *ngIf="service$ | async">
     <mat-card>
       <mat-card-header>
@@ -78,8 +80,8 @@
             <div class="input-row">
               <p class="mat-subheading-1">HTTP Body</p>
               <mat-form-field appearance="outline">
-                <mat-label>HTTP Body</mat-label>
-                <input matInput placeholder="HTTP Body"
+                <mat-label>HTTP Body</mat-label><!---->
+                <input matInput placeholder='{"name": "monhttp"}'
                        formControlName="httpBody">
               </mat-form-field>
             </div>

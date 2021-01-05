@@ -1,7 +1,10 @@
 <div id="services-component">
-  <div class="create-button-container">
+  <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+
+  <div class="create-button-container" *ngIf="!isLoading">
     <button mat-raised-button color="primary" (click)="onCreateClick()">Create</button>
   </div>
+
   <table mat-table [dataSource]="dataSource$" class="mat-elevation-z2">
     <!-- Name Column -->
     <ng-container matColumnDef="name">

@@ -51,6 +51,8 @@ export class EditServiceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isLoading = true;
+
     this.service$ = this.route.params
       .pipe(
         map(params => params['id']),
@@ -58,7 +60,8 @@ export class EditServiceComponent implements OnInit {
         tap(service => {
           this.serviceId = service.id;
           this.setFormGroupValues(service);
-        })
+        }),
+        tap(() => this.isLoading = false)
       );
 
     this.serviceTypeSubscription = this.serviceType.valueChanges
@@ -91,10 +94,13 @@ export class EditServiceComponent implements OnInit {
 
     this.isLoading = true;
 
+    this.disableFormAllFields();
+
     const formValues = this.formGroup.value as Service;
     this.serviceService.put(this.serviceId, formValues)
       .pipe(
-        tap(() => this.isLoading = false)
+        tap(() => this.isLoading = false),
+        tap(() => this.enableFormAllFields())
       ).subscribe(
       () => this.router.navigate(['services']),
       (error: ApiError) => this.errorService.setError(error)
@@ -108,5 +114,17 @@ export class EditServiceComponent implements OnInit {
 
   get httpMethod(): string {
     return (this.formGroup.get('httpMethod') as FormControl).value;
+  }
+
+  disableFormAllFields() {
+    for (let controlKey in this.formGroup.controls) {
+      this.formGroup.get(controlKey).disable();
+    }
+  }
+
+  enableFormAllFields() {
+    for (let controlKey in this.formGroup.controls) {
+      this.formGroup.get(controlKey).disable();
+    }
   }
 }

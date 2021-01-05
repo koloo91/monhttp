@@ -3,6 +3,7 @@ import {ServiceService} from '../../services/service.service';
 import {Observable} from 'rxjs';
 import {Service} from '../../models/service.model';
 import {Router} from '@angular/router';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,6 +12,7 @@ import {Router} from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
 
+  isLoading = false;
   services$: Observable<Service[]>;
 
   constructor(private serviceService: ServiceService,
@@ -18,7 +20,11 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.services$ = this.serviceService.list();
+    this.isLoading = true;
+    this.services$ = this.serviceService.list()
+      .pipe(
+        tap(() => this.isLoading = false)
+      );
   }
 
   showServiceDetails(serviceId: string): void {
