@@ -65,15 +65,39 @@ export class CreateServiceComponent implements OnInit, OnDestroy {
 
   saveService(): void {
     this.isLoading = true;
+
+    this.disableFormAllFields();
+
     const service = this.formGroup.value as Service;
     this.serviceService.create(service)
       .pipe(
-        tap(() => this.isLoading = false)
+        tap(() => this.isLoading = false),
+        tap(() => this.enableFormAllFields())
       )
       .subscribe(() => {
         this.router.navigate(['/services']);
       }, (error: ApiError) => {
         this.errorService.setError(error);
       });
+  }
+
+  get enableNotifications(): boolean {
+    return (this.formGroup.get('enableNotifications') as FormControl).value;
+  }
+
+  get httpMethod(): string {
+    return (this.formGroup.get('httpMethod') as FormControl).value;
+  }
+
+  disableFormAllFields() {
+    for (let controlKey in this.formGroup.controls) {
+      this.formGroup.get(controlKey).disable();
+    }
+  }
+
+  enableFormAllFields() {
+    for (let controlKey in this.formGroup.controls) {
+      this.formGroup.get(controlKey).disable();
+    }
   }
 }

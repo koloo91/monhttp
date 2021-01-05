@@ -1,4 +1,5 @@
 <div id="dashboard-component">
+  <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
   <app-service-card *ngFor="let service of (services$ | async)"
                     [service]="service"
                     (cardClicked)="showServiceDetails($event)"
