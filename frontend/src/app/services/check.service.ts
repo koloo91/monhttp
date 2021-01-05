@@ -15,8 +15,14 @@ export class CheckService {
   constructor(private http: HttpClient) {
   }
 
-  list(serviceId: string, from: string, to: string): Observable<Check[]> {
-    return this.http.get<Wrapper<Check>>(`/api/services/${serviceId}/checks`, {params: {from, to}})
+  list(serviceId: string, from: string, to: string, reduceByFactor: number): Observable<Check[]> {
+    return this.http.get<Wrapper<Check>>(`/api/services/${serviceId}/checks`, {
+      params: {
+        from,
+        to,
+        reduceByFactor: `${reduceByFactor}`
+      }
+    })
       .pipe(
         map(wrapper => wrapper.data)
       )

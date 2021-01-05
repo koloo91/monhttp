@@ -18,12 +18,15 @@ var (
 func prepareCheckStatements() {
 	var err error
 
-	selectChecksByServiceIdAndCreatedAtStatement, err = db.Prepare(`SELECT id, 
-					   latency_in_ms, 
-					   is_failure, 
-					   created_at FROM "check"
-					   WHERE service_id = $1 AND created_at >= $2 AND created_at <= $3
-						ORDER BY created_at DESC;`)
+	selectChecksByServiceIdAndCreatedAtStatement, err = db.Prepare(`SELECT id, latency_in_ms, is_failure, created_at
+																			FROM (
+																					 SELECT *, row_number() over (ORDER BY created_at DESC) AS row
+																					 FROM "check"
+																					 WHERE service_id = $1
+																					   AND created_at >= $2
+																					   AND created_at <= $3
+																					 ORDER BY created_at DESC) as checks
+																			WHERE row % $4 = 0;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,8 +75,8 @@ func InsertCheck(ctx context.Context, tx *sql.Tx, check model.Check) error {
 	return nil
 }
 
-func SelectChecks(ctx context.Context, serviceId string, from, to time.Time) ([]model.Check, error) {
-	rows, err := selectChecksByServiceIdAndCreatedAtStatement.QueryContext(ctx, serviceId, from, to)
+func SelectChecks(ctx context.Context, serviceId string, from, to time.Time, reduceByFactor int) ([]model.Check, error) {
+	rows, err := selectChecksByServiceIdAndCreatedAtStatement.QueryContext(ctx, serviceId, from, to, reduceByFactor)
 	if err != nil {
 		return nil, err
 	}

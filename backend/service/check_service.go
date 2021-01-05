@@ -9,8 +9,11 @@ import (
 	"time"
 )
 
-func GetChecks(ctx context.Context, serviceId string, from, to time.Time) ([]model.Check, error) {
-	return repository.SelectChecks(ctx, serviceId, from, to)
+func GetChecks(ctx context.Context, serviceId string, from, to time.Time, reduceByFactor int) ([]model.Check, error) {
+	if reduceByFactor <= 0 {
+		reduceByFactor = 1
+	}
+	return repository.SelectChecks(ctx, serviceId, from, to, reduceByFactor)
 }
 
 func GetAverageValues(ctx context.Context, serviceId string) (model.Average, error) {

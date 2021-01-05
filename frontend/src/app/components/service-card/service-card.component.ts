@@ -58,7 +58,7 @@ export class ServiceCardComponent implements OnInit {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString())
+    this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString(), 6)
       .pipe(
         map(checks => checks.reverse()),
         tap(() => this.isLoading = false)

@@ -166,7 +166,7 @@ export class ServiceDetailsComponent implements OnInit {
         switchMap(([id, {
           fromDateTime,
           toDateTime
-        }]) => this.checkService.list(id, fromDateTime.toISOString(), toDateTime.toISOString())),
+        }]) => this.checkService.list(id, fromDateTime.toISOString(), toDateTime.toISOString(), 1)),
         map(checks => checks.reverse()),
       )
       .subscribe(checks => {

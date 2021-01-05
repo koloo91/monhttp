@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/service"
@@ -10,27 +9,23 @@ import (
 	"time"
 )
 
+type GetChecksQueryParameter struct {
+	From           *time.Time `form:"from" binding:"required"`
+	To             *time.Time `form:"to" binding:"required"`
+	ReduceByFactor *int       `form:"reduceByFactor" binding:"required"`
+}
+
 func getChecks(ctx *gin.Context) {
 	serviceId := ctx.Param("id")
 
-	fromString := ctx.Query("from")
-	toString := ctx.Query("to")
-
-	from, err := time.Parse(time.RFC3339, fromString)
-	if err != nil {
-		log.Errorf("Unable to parse from date '%s' - '%s'", fromString, err)
-		ctx.JSON(http.StatusBadRequest, toApiError(fmt.Errorf("date must be in format '%s'", time.RFC3339)))
+	var queryParameter GetChecksQueryParameter
+	if err := ctx.ShouldBindQuery(&queryParameter); err != nil {
+		log.Errorf("Unable to get query parameter: '%s'", err)
+		ctx.JSON(http.StatusBadRequest, toApiError(err))
 		return
 	}
 
-	to, err := time.Parse(time.RFC3339, toString)
-	if err != nil {
-		log.Errorf("Unable to parse to date '%s' - '%s'", toString, err)
-		ctx.JSON(http.StatusBadRequest, toApiError(fmt.Errorf("date must be in format '%s'", time.RFC3339)))
-		return
-	}
-
-	checks, err := service.GetChecks(ctx.Request.Context(), serviceId, from, to)
+	checks, err := service.GetChecks(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To, *queryParameter.ReduceByFactor)
 	if err != nil {
 		log.Errorf("Unable to get checks from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
