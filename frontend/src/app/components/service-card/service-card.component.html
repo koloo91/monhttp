@@ -6,7 +6,7 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div *ngIf="average$ | async as average" class="latency-values" (click)="onCardClicked()">
+      <div *ngIf="average$ | async as average; else averageIsLoading" class="latency-values" (click)="onCardClicked()">
         <div>
           <div><b>{{average.lastDayResponseTime}} ms</b></div>
           <div class="mat-small">Latency last 24h</div>
@@ -16,6 +16,18 @@
           <div class="mat-small">Latency last week</div>
         </div>
       </div>
+      <ng-template #averageIsLoading>
+        <div class="latency-values">
+          <div>
+            <div><b>0 ms</b></div>
+            <div class="mat-small">Latency last 24h</div>
+          </div>
+          <div>
+            <div><b>0 ms</b></div>
+            <div class="mat-small">Latency last week</div>
+          </div>
+        </div>
+      </ng-template>
       <mat-divider></mat-divider>
 
       <div style="height: 200px">
