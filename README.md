@@ -4,12 +4,12 @@ Status Page for monitoring your websites and applications with graphs and analyt
 
 ## Run everywhere
 
-monhttp is written in Go(lang). All you need is the precompiled binary based on your operating system, and the
-HTML/CSS/Javascript files. You can even run monhttp on your Raspberry Pi.
+`monhttp` is written in Go(lang). All you need is the precompiled binary based on your operating system, and the
+HTML/CSS/Javascript files. You can even run `monhttp` on your Raspberry Pi.
 
 ## Notifications
 
-monhttp can notify you via email or Telegram when a service is unavailable. More notification types coming soon.
+`monhttp` can notify you via email or Telegram when a service is unavailable. More notification types coming soon.
 
 ## Run on Docker
 
@@ -25,6 +25,12 @@ when starting the container.
 ``` shell
 docker run -p 8081:8081 -v your_path:/monhttp/config koloooo/monhttp
 ```
+
+## Use docker-compose
+
+Simply run `docker-compose up` to start `monhttp` together with a postgres database. Open
+up [`http://localhost:8081`](http://localhost:8081) in your browser and enjoy `monhttp`. The default user is `admin` and
+the password is `admin` too.
 
 ## Build it locally
 
@@ -42,19 +48,21 @@ with `./monhttp`.
 
 ## Configuration
 
-After the initial setup, there is a config.yml in the config folder. This file can be used to change or save the
+After the initial setup, there is a config.env in the config folder. This file can be used to change or save the
 configuration.
 
 | Key  | Value  | Description  |
 |---|---|---|
-|  database.host | localhost  |   |
-|  database.name |  monhttp |   |
-|  database.password |  top_secret |   |
-|  database.port | 5432  |   |
-|  database.user | monhttp_user  |   |
+|  DATABASE_HOST | localhost  |   |
+|  DATABASE_NAME |  monhttp |   |
+|  DATABASE_PASSWORD |  top_secret |   |
+|  DATABASE_PORT | 5432  |   |
+|  DATABASE_USER | monhttp_user  |   |
 |   |   |   |
-|  notifier |   |   |
+|  NOTIFIER |   |   |
 |   |   |   |
-|  server.port | 8081  |   |
+|  SERVER_PORT | 8081  |   |
 |   |   |   |
-|  users |   | A list in the format "name:password" you can add here as many users as you want to  |
+|  USERS |   | A list in the format "name:password" you can add here as many users as you want to  |
+
+You can also use environment variables to configure `monhttp`. Environment variables override the values from the `config.env` file.
