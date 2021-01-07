@@ -8,9 +8,6 @@ import (
 	"strings"
 )
 
-var (
-	onAdminSetCallback func(string, string)
-)
 
 func IsSetup() bool {
 	return len(config.Host) > 0 &&
@@ -34,7 +31,13 @@ func UpdateSettings(settings model.SettingsVo) error {
 		return err
 	}
 
-	if err := LoadDatabase(); err != nil {
+	host := settings.DatabaseHost
+	port := settings.DatabasePort
+	user := settings.DatabaseUser
+	password := settings.DatabasePassword
+	databaseName := settings.DatabaseName
+
+	if err := LoadDatabase(host, port, user, password, databaseName); err != nil {
 		log.Errorf("Unable to load database with configuration: '%s'", err)
 		return err
 	}
@@ -60,7 +63,4 @@ func LoadUsers() map[string]string {
 	}
 
 	return usersMap
-}
-func SetOnAdminSetCallback(callback func(string, string)) {
-	onAdminSetCallback = callback
 }

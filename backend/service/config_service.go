@@ -28,6 +28,7 @@ func LoadConfig() error {
 	viper.SetDefault("USERS", "admin:admin")
 
 	viper.SetDefault("SERVER_PORT", 8081)
+	viper.SetDefault("SCHEDULER_ENABLED", true)
 	viper.SetDefault("SCHEDULER_NUMBER_OF_WORKERS", 5)
 
 	viper.AutomaticEnv()

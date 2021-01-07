@@ -6,6 +6,7 @@ import (
 	"github.com/koloo91/monhttp/notifier"
 	"github.com/koloo91/monhttp/service"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
@@ -29,8 +30,14 @@ func main() {
 	service.SetNotificationSystem(notificationSystem)
 
 	if service.IsSetup() {
+		host := viper.GetString("database.host")
+		port := viper.GetInt("database.port")
+		user := viper.GetString("database.user")
+		password := viper.GetString("database.password")
+		databaseName := viper.GetString("database.name")
+
 		log.Info("Service ist setup. Connecting to database")
-		err := service.LoadDatabase()
+		err := service.LoadDatabase(host, port, user, password, databaseName)
 		if err != nil {
 			log.Fatalf("Unable to connect to database: '%s'", err)
 		}

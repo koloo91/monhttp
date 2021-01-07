@@ -7,20 +7,15 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/koloo91/monhttp/repository"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var (
 	database *sql.DB
 )
 
-func connectToDatabase() (*sql.DB, error) {
-	host := GetConfig().Host
-	port := GetConfig().Port
-	user := GetConfig().User
-	password := GetConfig().Password
-	dbname := GetConfig().DatabaseName
-
-	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+func connectToDatabase(host string, port int, user, password, databaseName string) (*sql.DB, error) {
+	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, databaseName)
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
