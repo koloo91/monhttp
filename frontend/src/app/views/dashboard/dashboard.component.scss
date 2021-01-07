@@ -1,16 +1,16 @@
 #dashboard-component {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  overflow: scroll;
-  justify-content: center;
+  .cards-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: scroll;
+    justify-content: center;
+  }
 
   .service-card {
     width: 100%;
-    //height: 330px;
     margin: 8px;
   }
-
 
   @media (min-width: 768px) {
     .service-card {
