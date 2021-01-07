@@ -24,7 +24,7 @@ func StartScheduleJob() {
 
 	jobIds := make(chan string, 1024)
 
-	for w := 1; w <= viper.GetInt("scheduler.numberOfWorkers"); w++ {
+	for w := 1; w <= viper.GetInt("SCHEDULER_NUMBER_OF_WORKERS"); w++ {
 		go worker(w, jobIds)
 	}
 

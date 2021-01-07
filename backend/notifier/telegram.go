@@ -22,15 +22,15 @@ func (n *TelegramNotifier) GetId() string {
 
 func NewTelegramNotifier() *TelegramNotifier {
 	data := make(map[string]interface{})
-	data["enabled"] = viper.GetBool("notifier.telegram.enabled")
-	data["apiToken"] = viper.GetString("notifier.telegram.apiToken")
-	data["channel"] = viper.GetString("notifier.telegram.channel")
+	data["enabled"] = viper.GetBool("NOTIFIER_TELEGRAM_ENABLED")
+	data["apiToken"] = viper.GetString("NOTIFIER_TELEGRAM_APITOKEN")
+	data["channel"] = viper.GetString("NOTIFIER_TELEGRAM_CHANNEL")
 
 	return &TelegramNotifier{
 		Notifier: model.Notifier{
 			Id:      "telegram",
 			Name:    "Telegram Notifier",
-			Enabled: viper.GetBool("notifier.telegram.enabled"),
+			Enabled: viper.GetBool("NOTIFIER_TELEGRAM_ENABLED"),
 			Data:    data,
 			Form: []model.NotificationForm{
 				{
@@ -56,8 +56,8 @@ func NewTelegramNotifier() *TelegramNotifier {
 				},
 			},
 		},
-		ApiToken: viper.GetString("notifier.telegram.apiToken"),
-		Channel:  viper.GetString("notifier.telegram.channel"),
+		ApiToken: viper.GetString("NOTIFIER_TELEGRAM_APITOKEN"),
+		Channel:  viper.GetString("NOTIFIER_TELEGRAM_CHANNEL"),
 	}
 }
 

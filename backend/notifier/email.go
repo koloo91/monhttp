@@ -23,23 +23,23 @@ func (n *EMailNotifier) GetId() string {
 
 func NewEMailNotifier() *EMailNotifier {
 	data := make(map[string]interface{})
-	data["enabled"] = viper.GetBool("notifier.email.enabled")
-	data["host"] = viper.GetString("notifier.email.host")
-	data["port"] = viper.GetInt("notifier.email.port")
-	data["from"] = viper.GetString("notifier.email.from")
-	data["password"] = viper.GetString("notifier.email.password")
-	data["to"] = strings.Join(viper.GetStringSlice("notifier.email.to"), ",")
+	data["enabled"] = viper.GetBool("NOTIFIER_EMAIL_ENABLED")
+	data["host"] = viper.GetString("NOTIFIER_EMAIL_HOST")
+	data["port"] = viper.GetInt("NOTIFIER_EMAIL_PORT")
+	data["from"] = viper.GetString("NOTIFIER_EMAIL_FROM")
+	data["password"] = viper.GetString("NOTIFIER_EMAIL_PASSWORD")
+	data["to"] = strings.Join(viper.GetStringSlice("NOTIFIER_EMAIL_TO"), ",")
 
-	username := viper.GetString("notifier.email.from")
-	password := viper.GetString("notifier.email.password")
-	host := viper.GetString("notifier.email.host")
+	username := viper.GetString("NOTIFIER_EMAIL_FROM")
+	password := viper.GetString("NOTIFIER_EMAIL_PASSWORD")
+	host := viper.GetString("NOTIFIER_EMAIL_HOST")
 	auth := smtp.PlainAuth("", username, password, host)
 
 	return &EMailNotifier{
 		Notifier: model.Notifier{
 			Id:      "email",
 			Name:    "E-Mail",
-			Enabled: viper.GetBool("notifier.email.enabled"),
+			Enabled: viper.GetBool("NOTIFIER_EMAIL_ENABLED"),
 			Data:    data,
 			Form: []model.NotificationForm{
 				{
@@ -86,10 +86,10 @@ func NewEMailNotifier() *EMailNotifier {
 				},
 			},
 		},
-		Host: viper.GetString("notifier.email.host"),
-		Port: viper.GetInt("notifier.email.port"),
-		From: viper.GetString("notifier.email.from"),
-		To:   strings.Split(viper.GetString("notifier.email.to"), ","),
+		Host: viper.GetString("NOTIFIER_EMAIL_HOST"),
+		Port: viper.GetInt("NOTIFIER_EMAIL_PORT"),
+		From: viper.GetString("NOTIFIER_EMAIL_FROM"),
+		To:   strings.Split(viper.GetString("NOTIFIER_EMAIL_TO"), ","),
 		Auth: auth,
 	}
 }

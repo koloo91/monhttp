@@ -29,6 +29,7 @@ func SetupRoutes() *gin.Engine {
 	apiGroup := router.Group("/api")
 
 	{
+		apiGroup.GET("/alive", alive)
 		apiGroup.GET("/setup", getSetup)
 		apiGroup.POST("/settings", postSettings)
 	}
@@ -80,6 +81,10 @@ func toApiError(err error) model.ApiErrorVo {
 	return model.ApiErrorVo{
 		Message: err.Error(),
 	}
+}
+
+func alive(ctx *gin.Context) {
+	ctx.String(http.StatusNoContent, "")
 }
 
 func isSetup() gin.HandlerFunc {
