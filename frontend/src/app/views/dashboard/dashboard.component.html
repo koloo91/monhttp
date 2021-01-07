@@ -1,8 +1,13 @@
 <div id="dashboard-component">
   <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
-  <app-service-card *ngFor="let service of (services$ | async)"
-                    [service]="service"
-                    (cardClicked)="showServiceDetails($event)"
-                    class="service-card">
-  </app-service-card>
+  <div *ngIf="services$ |async as services">
+    <app-service-card *ngFor="let service of services"
+                      [service]="service"
+                      (cardClicked)="showServiceDetails($event)"
+                      class="service-card">
+    </app-service-card>
+    <div *ngIf="services.length === 0">
+      Looks like you haven't created any services yet. <a href="/services/create">Click here to create a new service.</a>
+    </div>
+  </div>
 </div>

@@ -52,7 +52,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.dataSource$ = this.serviceService.list()
       .pipe(
-        map(services => services.map(service => service as ServiceWithStatusAndFailures))
+        map(services => services.map(service => service as ServiceWithStatusAndFailures)),
+        tap(() => this.isLoading = false)
       );
 
     this.subscriptions.push(
@@ -79,8 +80,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
                     map(failureCount => {
                       service.failureCount = failureCount.count;
                       return service;
-                    }),
-                    tap(() => this.isLoading = false)
+                    })
                   );
               }));
             }));

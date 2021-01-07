@@ -7,21 +7,20 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/koloo91/monhttp/repository"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 var (
 	database *sql.DB
 )
 
-func connectToDatabase(host string, port int, user, password, databaseName string) (*sql.DB, error) {
-	//host := viper.GetString("database.host")
-	//port := viper.GetInt("database.port")
-	//user := viper.GetString("database.user")
-	//password := viper.GetString("database.password")
-	//dbname := viper.GetString("database.name")
+func connectToDatabase() (*sql.DB, error) {
+	host := GetConfig().Host
+	port := GetConfig().Port
+	user := GetConfig().User
+	password := GetConfig().Password
+	dbname := GetConfig().DatabaseName
 
-	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, databaseName)
+	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
@@ -71,7 +70,6 @@ func LoadDatabase(host string, port int, user, password, databaseName string) er
 	repository.SetDatabase(database)
 	go StartScheduleJob(viper.GetBool("scheduler.enabled"))
 
-	SetIsSetup(true)
 	return nil
 }
 
