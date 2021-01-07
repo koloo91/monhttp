@@ -14,14 +14,14 @@ var (
 	database *sql.DB
 )
 
-func connectToDatabase() (*sql.DB, error) {
-	host := viper.GetString("database.host")
-	port := viper.GetInt("database.port")
-	user := viper.GetString("database.user")
-	password := viper.GetString("database.password")
-	dbname := viper.GetString("database.name")
+func connectToDatabase(host string, port int, user, password, databaseName string) (*sql.DB, error) {
+	//host := viper.GetString("database.host")
+	//port := viper.GetInt("database.port")
+	//user := viper.GetString("database.user")
+	//password := viper.GetString("database.password")
+	//dbname := viper.GetString("database.name")
 
-	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, databaseName)
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
@@ -51,13 +51,13 @@ func runDatabaseMigrations(db *sql.DB) error {
 	return nil
 }
 
-func LoadDatabase() error {
+func LoadDatabase(host string, port int, user, password, databaseName string) error {
 	if database != nil {
 		return nil
 	}
 
 	var err error
-	database, err = connectToDatabase()
+	database, err = connectToDatabase(host, port, user, password, databaseName)
 	if err != nil {
 		log.Errorf("Unable to connect to database: '%s'", err)
 		return err
@@ -69,7 +69,7 @@ func LoadDatabase() error {
 	}
 
 	repository.SetDatabase(database)
-	go StartScheduleJob()
+	go StartScheduleJob(viper.GetBool("scheduler.enabled"))
 
 	SetIsSetup(true)
 	return nil

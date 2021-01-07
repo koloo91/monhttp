@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/koloo91/monhttp/controller"
 	"github.com/koloo91/monhttp/notifier"
 	"github.com/koloo91/monhttp/service"
-	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"net/http"
@@ -26,6 +24,7 @@ func main() {
 	viper.WatchConfig()
 
 	viper.SetDefault("server.port", 8081)
+	viper.SetDefault("scheduler.enabled", true)
 	viper.SetDefault("scheduler.numberOfWorkers", 5)
 
 	service.SetIsSetup(true)
@@ -47,7 +46,13 @@ func main() {
 	service.SetNotificationSystem(notificationSystem)
 
 	if service.IsSetup() {
-		err := service.LoadDatabase()
+		host := viper.GetString("database.host")
+		port := viper.GetInt("database.port")
+		user := viper.GetString("database.user")
+		password := viper.GetString("database.password")
+		databaseName := viper.GetString("database.name")
+
+		err := service.LoadDatabase(host, port, user, password, databaseName)
 		if err != nil {
 			log.Fatalf("Unable to connect to database: '%s'", err)
 		}

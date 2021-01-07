@@ -19,7 +19,11 @@ import (
 	"time"
 )
 
-func StartScheduleJob() {
+func StartScheduleJob(enabled bool) {
+	if !enabled {
+		log.Info("Job scheduler is disabled")
+		return
+	}
 	log.Info("Starting job scheduler")
 
 	jobIds := make(chan string, 1024)
@@ -52,7 +56,7 @@ func worker(workerId int, jobIds <-chan string) {
 	log.Infof("Starting worker with id '%d'", workerId)
 
 	for jobId := range jobIds {
-		processService(workerId, jobId)
+		ProcessService(workerId, jobId)
 	}
 }
 
@@ -62,7 +66,7 @@ func getNextJobIds() ([]string, error) {
 	return repository.GetNextJobIds(ctx)
 }
 
-func processService(workerId int, jobId string) {
+func ProcessService(workerId int, jobId string) {
 	logger := log.WithFields(log.Fields{"jobId": jobId, "workerId": workerId})
 
 	logger.Infof("Processing job with id: '%s'", jobId)

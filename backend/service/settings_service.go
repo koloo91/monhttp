@@ -5,15 +5,14 @@ import (
 	"github.com/koloo91/monhttp/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 var (
-	isSetup            bool
-	onAdminSetCallback func(string, string)
+	isSetup bool
 )
 
 func IsSetup() bool {
+	// TODO: refactor this
 	return isSetup
 }
 
@@ -30,31 +29,21 @@ func UpdateSettings(settings model.SettingsVo) error {
 
 	viper.Set("users", []string{fmt.Sprintf("%s:%s", settings.Username, settings.Password)})
 
-	if err := LoadDatabase(); err != nil {
+	host := settings.DatabaseHost
+	port := settings.DatabasePort
+	user := settings.DatabaseUser
+	password := settings.DatabasePassword
+	databaseName := settings.DatabaseName
+
+	if err := LoadDatabase(host, port, user, password, databaseName); err != nil {
 		log.Errorf("Unable to load database with configuration: '%s'", err)
 		return err
 	}
 
-	onAdminSetCallback(settings.Username, settings.Password)
+	if err := AddUser(settings.Username, settings.Password); err != nil {
+		return err
+	}
 
 	log.Info("Writing new settings into config.yml")
 	return viper.WriteConfigAs("./config/config.yml")
-}
-
-func LoadUsers() map[string]string {
-	usersMap := make(map[string]string)
-
-	users := viper.GetStringSlice("users")
-	for _, user := range users {
-		usernameAndPassword := strings.Split(user, ":")
-		if len(usernameAndPassword) != 2 {
-			continue
-		}
-		usersMap[usernameAndPassword[0]] = usernameAndPassword[1]
-	}
-
-	return usersMap
-}
-func SetOnAdminSetCallback(callback func(string, string)) {
-	onAdminSetCallback = callback
 }

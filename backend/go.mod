@@ -13,10 +13,13 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/lib/pq v1.9.0
+	github.com/magiconair/properties v1.8.1
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/viper v1.7.1
+	github.com/stretchr/testify v1.6.1
+	github.com/testcontainers/testcontainers-go v0.9.0
 	github.com/ugorji/go v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9 // indirect
 	golang.org/x/sys v0.0.0-20201211090839-8ad439b19e0f // indirect

@@ -11,10 +11,6 @@ import (
 	"strings"
 )
 
-var (
-	users = make(map[string]string)
-)
-
 func SetupRoutes() *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -35,12 +31,6 @@ func SetupRoutes() *gin.Engine {
 
 	apiGroup.Use(isSetup())
 	apiGroup.Use(basicAuth())
-
-	service.SetOnAdminSetCallback(func(username, password string) {
-		users[username] = password
-	})
-
-	users = service.LoadUsers()
 
 	{
 		apiGroup.GET("/login", func(ctx *gin.Context) {
@@ -127,7 +117,7 @@ func basicAuth() gin.HandlerFunc {
 			return
 		}
 
-		if password, exists := users[usernameAndPassword[0]]; exists {
+		if password, exists := service.GetUsers()[usernameAndPassword[0]]; exists {
 			if password != usernameAndPassword[1] {
 				ctx.JSON(http.StatusUnauthorized, model.ApiErrorVo{Message: "invalid credentials"})
 				ctx.Abort()
