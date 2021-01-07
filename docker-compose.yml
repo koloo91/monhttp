@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: monhttp
+      POSTGRES_PASSWORD: monhttp
+
+  monhttp:
+    image: koloooo/monhttp
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: monhttp
+      DATABASE_PASSWORD: monhttp
+      DATABASE_NAME: monhttp
+      USERS: admin:admin
+    volumes:
+      - "./:/monhttp/config"
