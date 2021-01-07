@@ -1,6 +1,6 @@
 <div id="dashboard-component">
   <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
-  <div *ngIf="services$ |async as services">
+  <div class="cards-container" *ngIf="services$ |async as services">
     <app-service-card *ngFor="let service of services"
                       [service]="service"
                       (cardClicked)="showServiceDetails($event)"
