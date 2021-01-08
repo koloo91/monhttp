@@ -19,7 +19,7 @@ Use the [official Docker image](https://hub.docker.com/r/koloooo/monhttp) to run
 docker run -p 8081:8081 koloooo/monhttp
 ```
 
-To save the config.yml from the container for later, you need to mount the path `/monhttp/config`. Add a volume for this
+To save the config.env from the container for later, you need to mount the path `/monhttp/config`. Add a volume for this
 when starting the container.
 
 ``` shell
