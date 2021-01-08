@@ -25,7 +25,7 @@ func (suite *MonHttpTestSuite) SetupSuite() {
 	container, host, port := startPostgresContainer(suite.T())
 	suite.postgresContainer = container
 
-	if err := service.LoadDatabase(host, port, "postgres", "postgres", "postgres"); err != nil {
+	if err := service.LoadDatabase(host, port, "postgres", "postgres", "postgres", "../migrations"); err != nil {
 		suite.Fail("Unable to load database: ", err)
 	}
 

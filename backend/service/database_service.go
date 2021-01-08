@@ -27,13 +27,13 @@ func connectToDatabase(host string, port int, user, password, databaseName strin
 	return db, nil
 }
 
-func runDatabaseMigrations(db *sql.DB) error {
+func runDatabaseMigrations(db *sql.DB, migrationsDirectory string) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return err
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://./migrations", "postgres", driver)
+	m, err := migrate.NewWithDatabaseInstance(fmt.Sprintf("file://%s", migrationsDirectory), "postgres", driver)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func runDatabaseMigrations(db *sql.DB) error {
 	return nil
 }
 
-func LoadDatabase(host string, port int, user, password, databaseName string) error {
+func LoadDatabase(host string, port int, user, password, databaseName, migrationsDirectory string) error {
 	if database != nil {
 		return nil
 	}
@@ -56,7 +56,7 @@ func LoadDatabase(host string, port int, user, password, databaseName string) er
 		return err
 	}
 
-	if err := runDatabaseMigrations(database); err != nil {
+	if err := runDatabaseMigrations(database, migrationsDirectory); err != nil {
 		log.Errorf("Unable to run database migrations: '%s'", err)
 		return err
 	}

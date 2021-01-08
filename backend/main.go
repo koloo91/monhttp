@@ -38,7 +38,7 @@ func main() {
 		databaseName := service.GetConfig().DatabaseName
 
 		log.Info("Service ist setup. Connecting to database")
-		err := service.LoadDatabase(host, port, user, password, databaseName)
+		err := service.LoadDatabase(host, port, user, password, databaseName, "./migrations")
 		if err != nil {
 			log.Fatalf("Unable to connect to database: '%s'", err)
 		}

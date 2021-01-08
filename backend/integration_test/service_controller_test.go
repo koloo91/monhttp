@@ -19,7 +19,7 @@ func (suite *MonHttpTestSuite) TestCreateNewService() {
 	assert.Nil(suite.T(), err)
 
 	recorder := httptest.NewRecorder()
-	request, _ := http.NewRequest("POST", "/api/service", bytes.NewBuffer(requestBody))
+	request, _ := http.NewRequest("POST", "/api/services", bytes.NewBuffer(requestBody))
 
 	suite.router.ServeHTTP(recorder, request)
 

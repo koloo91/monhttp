@@ -36,7 +36,7 @@ func UpdateSettings(settings model.SettingsVo) error {
 	password := GetConfig().Password
 	databaseName := GetConfig().DatabaseName
 
-	if err := LoadDatabase(host, port, user, password, databaseName); err != nil {
+	if err := LoadDatabase(host, port, user, password, databaseName, "./migrations"); err != nil {
 		log.Errorf("Unable to load database with configuration: '%s'", err)
 		return err
 	}
