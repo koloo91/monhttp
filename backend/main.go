@@ -31,6 +31,7 @@ func main() {
 	service.SetNotificationSystem(notificationSystem)
 
 	if service.IsSetup() {
+		log.Info("Service ist setup. Connecting to database")
 		err := service.LoadDatabase()
 		if err != nil {
 			log.Fatalf("Unable to connect to database: '%s'", err)

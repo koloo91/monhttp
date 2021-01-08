@@ -1,6 +1,10 @@
 NAME=monhttp
 VERSION=`cat version`
 
+.PHONY: buildDockerImage
+buildDockerImage:
+	docker build -t koloooo/monhttp:$(VERSION) -t koloooo/monhttp:latest .
+
 .PHONY: buildAndPushDockerImage
 buildAndPushDockerImage:
 	docker build -t koloooo/monhttp:$(VERSION) -t koloooo/monhttp:latest .
