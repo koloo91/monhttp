@@ -4,7 +4,7 @@ type Config struct {
 	ServerPort int `mapstructure:"SERVER_PORT"`
 
 	SchedulerEnabled         bool `mapstructure:"SCHEDULER_ENABLED"`
-	SchedulerNumberOfWorkers bool `mapstructure:"SCHEDULER_NUMBER_OF_WORKERS"`
+	SchedulerNumberOfWorkers int  `mapstructure:"SCHEDULER_NUMBER_OF_WORKERS"`
 
 	Host         string `mapstructure:"DATABASE_HOST"`
 	Port         int    `mapstructure:"DATABASE_PORT"`

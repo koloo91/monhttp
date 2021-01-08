@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-
 func IsSetup() bool {
 	return len(config.Host) > 0 &&
 		config.Port > 0 &&
@@ -31,11 +30,11 @@ func UpdateSettings(settings model.SettingsVo) error {
 		return err
 	}
 
-	host := settings.DatabaseHost
-	port := settings.DatabasePort
-	user := settings.DatabaseUser
-	password := settings.DatabasePassword
-	databaseName := settings.DatabaseName
+	host := GetConfig().Host
+	port := GetConfig().Port
+	user := GetConfig().User
+	password := GetConfig().Password
+	databaseName := GetConfig().DatabaseName
 
 	if err := LoadDatabase(host, port, user, password, databaseName); err != nil {
 		log.Errorf("Unable to load database with configuration: '%s'", err)
@@ -50,17 +49,15 @@ func UpdateSettings(settings model.SettingsVo) error {
 	return viper.WriteConfigAs("./config/config.env")
 }
 
-func LoadUsers() map[string]string {
-	usersMap := make(map[string]string)
-
+func LoadUsers() {
 	users := strings.Split(GetConfig().Users, ",")
 	for _, user := range users {
 		usernameAndPassword := strings.Split(user, ":")
 		if len(usernameAndPassword) != 2 {
 			continue
 		}
-		usersMap[usernameAndPassword[0]] = usernameAndPassword[1]
+		if err := AddUser(usernameAndPassword[0], usernameAndPassword[1]); err != nil {
+			log.Warnf("Unable to add user: '%s'", err)
+		}
 	}
-
-	return usersMap
 }

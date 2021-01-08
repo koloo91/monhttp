@@ -7,7 +7,6 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/koloo91/monhttp/repository"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -63,7 +62,7 @@ func LoadDatabase(host string, port int, user, password, databaseName string) er
 	}
 
 	repository.SetDatabase(database)
-	go StartScheduleJob(viper.GetBool("scheduler.enabled"))
+	go StartScheduleJob(GetConfig().SchedulerEnabled)
 
 	return nil
 }
