@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
+
+  monhttp:
+    image: koloooo/monhttp:latest
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: monhttp
+      DATABASE_PASSWORD: monhttp
+      DATABASE_NAME: monhttp
+      USERS: admin:admin
+    volumes:
+      - "./:/monhttp/config"
+    restart: always
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: monhttp
+      POSTGRES_PASSWORD: monhttp
+
+
