@@ -8,10 +8,6 @@ import (
 	"strings"
 )
 
-var (
-	onAdminSetCallback func(string, string)
-)
-
 func IsSetup() bool {
 	return len(config.Host) > 0 &&
 		config.Port > 0 &&
@@ -34,31 +30,34 @@ func UpdateSettings(settings model.SettingsVo) error {
 		return err
 	}
 
-	if err := LoadDatabase(); err != nil {
+	host := GetConfig().Host
+	port := GetConfig().Port
+	user := GetConfig().User
+	password := GetConfig().Password
+	databaseName := GetConfig().DatabaseName
+
+	if err := LoadDatabase(host, port, user, password, databaseName, "./migrations"); err != nil {
 		log.Errorf("Unable to load database with configuration: '%s'", err)
 		return err
 	}
 
-	onAdminSetCallback(settings.Username, settings.Password)
+	if err := AddUser(settings.Username, settings.Password); err != nil {
+		return err
+	}
 
 	log.Info("Writing new settings into config.env")
 	return viper.WriteConfigAs("./config/config.env")
 }
 
-func LoadUsers() map[string]string {
-	usersMap := make(map[string]string)
-
+func LoadUsers() {
 	users := strings.Split(GetConfig().Users, ",")
 	for _, user := range users {
 		usernameAndPassword := strings.Split(user, ":")
 		if len(usernameAndPassword) != 2 {
 			continue
 		}
-		usersMap[usernameAndPassword[0]] = usernameAndPassword[1]
+		if err := AddUser(usernameAndPassword[0], usernameAndPassword[1]); err != nil {
+			log.Warnf("Unable to add user: '%s'", err)
+		}
 	}
-
-	return usersMap
-}
-func SetOnAdminSetCallback(callback func(string, string)) {
-	onAdminSetCallback = callback
 }

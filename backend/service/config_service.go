@@ -19,15 +19,16 @@ func LoadConfig() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("env")
 
-	viper.SetDefault("DATABASE_HOST", "localhost")
-	viper.SetDefault("DATABASE_PORT", 5432)
-	viper.SetDefault("DATABASE_USER", "monhttp")
-	viper.SetDefault("DATABASE_PASSWORD", "monhttp")
-	viper.SetDefault("DATABASE_NAME", "monhttp")
+	viper.SetDefault("DATABASE_HOST", "")
+	viper.SetDefault("DATABASE_PORT", 0)
+	viper.SetDefault("DATABASE_USER", "")
+	viper.SetDefault("DATABASE_PASSWORD", "")
+	viper.SetDefault("DATABASE_NAME", "")
 
-	viper.SetDefault("USERS", "admin:admin")
+	viper.SetDefault("USERS", "")
 
 	viper.SetDefault("SERVER_PORT", 8081)
+	viper.SetDefault("SCHEDULER_ENABLED", true)
 	viper.SetDefault("SCHEDULER_NUMBER_OF_WORKERS", 5)
 
 	viper.AutomaticEnv()

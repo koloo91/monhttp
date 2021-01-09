@@ -13,14 +13,8 @@ var (
 	database *sql.DB
 )
 
-func connectToDatabase() (*sql.DB, error) {
-	host := GetConfig().Host
-	port := GetConfig().Port
-	user := GetConfig().User
-	password := GetConfig().Password
-	dbname := GetConfig().DatabaseName
-
-	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+func connectToDatabase(host string, port int, user, password, databaseName string) (*sql.DB, error) {
+	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, databaseName)
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
@@ -33,13 +27,13 @@ func connectToDatabase() (*sql.DB, error) {
 	return db, nil
 }
 
-func runDatabaseMigrations(db *sql.DB) error {
+func runDatabaseMigrations(db *sql.DB, migrationsDirectory string) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return err
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://./migrations", "postgres", driver)
+	m, err := migrate.NewWithDatabaseInstance(fmt.Sprintf("file://%s", migrationsDirectory), "postgres", driver)
 	if err != nil {
 		return err
 	}
@@ -50,25 +44,25 @@ func runDatabaseMigrations(db *sql.DB) error {
 	return nil
 }
 
-func LoadDatabase() error {
+func LoadDatabase(host string, port int, user, password, databaseName, migrationsDirectory string) error {
 	if database != nil {
 		return nil
 	}
 
 	var err error
-	database, err = connectToDatabase()
+	database, err = connectToDatabase(host, port, user, password, databaseName)
 	if err != nil {
 		log.Errorf("Unable to connect to database: '%s'", err)
 		return err
 	}
 
-	if err := runDatabaseMigrations(database); err != nil {
+	if err := runDatabaseMigrations(database, migrationsDirectory); err != nil {
 		log.Errorf("Unable to run database migrations: '%s'", err)
 		return err
 	}
 
 	repository.SetDatabase(database)
-	go StartScheduleJob()
+	go StartScheduleJob(GetConfig().SchedulerEnabled)
 
 	return nil
 }

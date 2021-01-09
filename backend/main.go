@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/koloo91/monhttp/controller"
 	"github.com/koloo91/monhttp/notifier"
 	"github.com/koloo91/monhttp/service"
-	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -30,9 +28,17 @@ func main() {
 
 	service.SetNotificationSystem(notificationSystem)
 
+	service.LoadUsers()
+
 	if service.IsSetup() {
+		host := service.GetConfig().Host
+		port := service.GetConfig().Port
+		user := service.GetConfig().User
+		password := service.GetConfig().Password
+		databaseName := service.GetConfig().DatabaseName
+
 		log.Info("Service ist setup. Connecting to database")
-		err := service.LoadDatabase()
+		err := service.LoadDatabase(host, port, user, password, databaseName, "./migrations")
 		if err != nil {
 			log.Fatalf("Unable to connect to database: '%s'", err)
 		}
