@@ -9,6 +9,7 @@ services:
 
   monhttp:
     image: koloooo/monhttp:latest
+    container_name: monhttp
     ports:
       - "8081:8081"
     depends_on:

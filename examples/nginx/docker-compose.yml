@@ -11,6 +11,7 @@ services:
 
   monhttp:
     image: koloooo/monhttp:latest
+    container_name: monhttp
     depends_on:
       - postgres
     environment:
