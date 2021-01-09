@@ -15,7 +15,7 @@ func getSetup(ctx *gin.Context) {
 func postSettings(ctx *gin.Context) {
 	if service.IsSetup() {
 		log.Info("Is already setup, skipping")
-		ctx.JSON(http.StatusOK, "")
+		ctx.String(http.StatusNoContent, "")
 		return
 	}
 
@@ -32,5 +32,5 @@ func postSettings(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "")
+	ctx.String(http.StatusNoContent, "")
 }
