@@ -8,11 +8,7 @@ import (
 	"net/http/httptest"
 )
 
-func (suite *MonHttpTestSuite) TestExample() {
-	suite.Equal(true, false)
-}
-
-func (suite *MonHttpTestSuite) TestCreateNewService() {
+func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnNotSetupIfNotSetup() {
 	requestBody, err := json.Marshal(map[string]interface{}{
 		"name": "Foo",
 	})
@@ -23,6 +19,9 @@ func (suite *MonHttpTestSuite) TestCreateNewService() {
 
 	suite.router.ServeHTTP(recorder, request)
 
-	suite.Equal(200, recorder.Code)
-	suite.Equal(suite.T(), "pong", recorder.Body.String())
+	var responseBody map[string]interface{}
+	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
+
+	assert.Equal(suite.T(), 400, recorder.Code)
+	assert.Equal(suite.T(), "monhttp needs to be setup", responseBody["message"])
 }
