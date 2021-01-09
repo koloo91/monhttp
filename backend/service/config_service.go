@@ -45,5 +45,5 @@ func LoadConfig() error {
 		return err
 	}
 
-	return nil
+	return viper.WriteConfigAs("./config/config.env")
 }
