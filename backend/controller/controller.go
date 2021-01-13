@@ -5,13 +5,19 @@ import (
 	"fmt"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/service"
 	"net/http"
+	"reflect"
 	"strings"
+	"sync"
 )
 
 func SetupRoutes() *gin.Engine {
+	binding.Validator = new(defaultValidator)
+
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
@@ -137,4 +143,76 @@ func basicAuth() gin.HandlerFunc {
 		ctx.Abort()
 		return
 	}
+}
+
+type defaultValidator struct {
+	once     sync.Once
+	validate *validator.Validate
+}
+
+var _ binding.StructValidator = &defaultValidator{}
+
+func (v *defaultValidator) ValidateStruct(obj interface{}) error {
+
+	if kindOfData(obj) == reflect.Struct {
+
+		v.lazyinit()
+
+		if err := v.validate.Struct(obj); err != nil {
+			return error(err)
+		}
+	}
+
+	return nil
+}
+
+func (v *defaultValidator) Engine() interface{} {
+	v.lazyinit()
+	return v.validate
+}
+
+func (v *defaultValidator) lazyinit() {
+	v.once.Do(func() {
+		v.validate = validator.New()
+		v.validate.SetTagName("binding")
+
+		// add any custom validations etc. here
+		v.validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+			name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+			return name
+		})
+	})
+}
+
+func kindOfData(data interface{}) reflect.Kind {
+
+	value := reflect.ValueOf(data)
+	valueType := value.Kind()
+
+	if valueType == reflect.Ptr {
+		valueType = value.Elem().Kind()
+	}
+	return valueType
+}
+
+type fieldError struct {
+	err validator.FieldError
+}
+
+func (q fieldError) String() string {
+	var sb strings.Builder
+
+	sb.WriteString("validation failed on field '" + q.err.Field() + "'")
+	sb.WriteString(", condition: " + q.err.ActualTag())
+
+	// Print condition parameters, e.g. oneof=red blue -> { red blue }
+	if q.err.Param() != "" {
+		sb.WriteString(" { " + q.err.Param() + " }")
+	}
+
+	if q.err.Value() != nil && q.err.Value() != "" {
+		sb.WriteString(fmt.Sprintf(", actual: %v", q.err.Value()))
+	}
+
+	return sb.String()
 }

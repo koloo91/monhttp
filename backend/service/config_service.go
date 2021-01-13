@@ -1,9 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"github.com/koloo91/monhttp/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"os"
 )
 
 var (
@@ -15,8 +17,13 @@ func GetConfig() model.Config {
 }
 
 func LoadConfig() error {
-	viper.AddConfigPath("./config")
-	viper.SetConfigName("config")
+	configLocation := "./config"
+	configName := "config"
+
+	_ = os.Mkdir(configLocation, os.ModePerm)
+
+	viper.AddConfigPath(configLocation)
+	viper.SetConfigName(configName)
 	viper.SetConfigType("env")
 
 	viper.SetDefault("DATABASE_HOST", "")
@@ -45,5 +52,5 @@ func LoadConfig() error {
 		return err
 	}
 
-	return viper.WriteConfigAs("./config/config.env")
+	return viper.WriteConfigAs(fmt.Sprintf("%s/%s.env", configLocation, configName))
 }

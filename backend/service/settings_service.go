@@ -45,8 +45,8 @@ func UpdateSettings(settings model.SettingsVo) error {
 		return err
 	}
 
-	log.Info("Writing new settings into config.env")
-	return viper.WriteConfigAs("./config/config.env")
+	log.Info("Writing new settings into config")
+	return viper.WriteConfig()
 }
 
 func LoadUsers() {
