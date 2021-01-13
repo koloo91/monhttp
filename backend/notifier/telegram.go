@@ -61,12 +61,14 @@ func NewTelegramNotifier() *TelegramNotifier {
 	}
 }
 
-func (n *TelegramNotifier) SendSuccess(service model.Service) error {
+func (n *TelegramNotifier) SendServiceIsUpNotification(service model.Service) error {
+	// TODO: prepare message before
+	// TODO: get template
 	message := fmt.Sprintf("Service '%s' is up again", service.Name)
 	return n.send(message)
 }
 
-func (n *TelegramNotifier) SendFailure(service model.Service, failure model.Failure) error {
+func (n *TelegramNotifier) SendServiceIsDownNotification(service model.Service, failure model.Failure) error {
 	message := fmt.Sprintf("Service '%s' is down.\nReason: %s", service.Name, failure.Reason)
 	return n.send(message)
 }

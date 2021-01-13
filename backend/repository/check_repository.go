@@ -136,7 +136,7 @@ func SelectIsOnline(ctx context.Context, serviceId string) (bool, error) {
 	return !isFailure, nil
 }
 
-func GetLastNChecks(ctx context.Context, tx *sql.Tx, serviceId string, numberOfEntries int) ([]model.Check, error) {
+func GetLastNChecksTx(ctx context.Context, tx *sql.Tx, serviceId string, numberOfEntries int) ([]model.Check, error) {
 	rows, err := tx.QueryContext(ctx, `SELECT id, latency_in_ms, is_failure, created_at 
 								FROM "check" 
 								WHERE service_id = $1

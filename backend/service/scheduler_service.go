@@ -134,20 +134,10 @@ func ProcessService(workerId int, jobId string) {
 		return
 	}
 
-	if check != nil {
-		if err := repository.InsertCheck(ctx, tx, *check); err != nil {
-			logger.Errorf("Unable to insert check for service '%s' - '%s'", service.Name, err)
-			if err := tx.Rollback(); err != nil {
-				logger.Errorf("Error rolling back transaction: '%s'", err)
-			}
-			return
-		}
-	}
-
 	if failure != nil {
 		if service.EnableNotifications {
 			logger.Infof("Notifications for service '%s' enabled", service.Name)
-			sendNotification, err := shouldSendNotification(ctx, tx, service)
+			sendFailureNotification, err := shouldSendFailureNotification(ctx, tx, service)
 			if err != nil {
 				logger.Errorf("Unable to determine if we should send a notfication for service '%s' - '%s'", service.Name, err)
 				if err := tx.Rollback(); err != nil {
@@ -156,9 +146,9 @@ func ProcessService(workerId int, jobId string) {
 				return
 			}
 
-			if sendNotification {
+			if sendFailureNotification {
 				logger.Infof("Sending notification for service '%s'", service.Name)
-				notificationSystem.AddNotification(notifier.NewNotification(service, *failure))
+				notificationSystem.AddNotification(notifier.NewNotification(service, false, *failure))
 			}
 		}
 
@@ -171,13 +161,63 @@ func ProcessService(workerId int, jobId string) {
 		}
 	}
 
+	if check != nil {
+		if service.EnableNotifications && !check.IsFailure {
+			sendUpNotification, err := shouldSendUpNotification(ctx, tx, service)
+			if err != nil {
+				logger.Errorf("Unable to determine if we should send a notfication for service '%s' - '%s'", service.Name, err)
+				if err := tx.Rollback(); err != nil {
+					logger.Errorf("Error rolling back transaction: '%s'", err)
+				}
+				return
+			}
+
+			if sendUpNotification {
+				notificationSystem.AddNotification(notifier.NewNotification(service, true, model.Failure{}))
+			}
+		}
+
+		if err := repository.InsertCheck(ctx, tx, *check); err != nil {
+			logger.Errorf("Unable to insert check for service '%s' - '%s'", service.Name, err)
+			if err := tx.Rollback(); err != nil {
+				logger.Errorf("Error rolling back transaction: '%s'", err)
+			}
+			return
+		}
+	}
+
 	if err := tx.Commit(); err != nil {
 		logger.Errorf("Error commiting transaction: '%s'", err)
 	}
 }
 
-func shouldSendNotification(ctx context.Context, tx *sql.Tx, service model.Service) (bool, error) {
-	checks, err := repository.GetLastNChecks(ctx, tx, service.Id, service.NotifyAfterNumberOfFailures)
+func shouldSendUpNotification(ctx context.Context, tx *sql.Tx, service model.Service) (bool, error) {
+	// check for last n failures
+	lastNChecks, err := repository.GetLastNChecksTx(ctx, tx, service.Id, service.NotifyAfterNumberOfFailures)
+	if err != nil {
+		return false, err
+	}
+
+	counter := 0
+	for _, check := range lastNChecks {
+		if check.IsFailure {
+			counter++
+		}
+	}
+
+	checks, err := repository.GetLastNChecksTx(ctx, tx, service.Id, 1)
+	if err != nil {
+		return false, err
+	}
+
+	if len(checks) >= 1 {
+		return checks[0].IsFailure && (counter >= service.NotifyAfterNumberOfFailures), nil
+	}
+	return false, nil
+}
+
+func shouldSendFailureNotification(ctx context.Context, tx *sql.Tx, service model.Service) (bool, error) {
+	checks, err := repository.GetLastNChecksTx(ctx, tx, service.Id, service.NotifyAfterNumberOfFailures)
 	if err != nil {
 		return false, err
 	}

@@ -33,8 +33,8 @@ type NotificationFormVo struct {
 
 type Notify interface {
 	GetId() string
-	SendSuccess(Service) error
-	SendFailure(Service, Failure) error
+	SendServiceIsUpNotification(Service) error
+	SendServiceIsDownNotification(Service, Failure) error
 	IsEnabled() bool
 	GetForms() []NotificationForm
 	GetName() string

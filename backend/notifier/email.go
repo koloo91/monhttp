@@ -94,12 +94,12 @@ func NewEMailNotifier() *EMailNotifier {
 	}
 }
 
-func (n *EMailNotifier) SendSuccess(service model.Service) error {
+func (n *EMailNotifier) SendServiceIsUpNotification(service model.Service) error {
 	message := fmt.Sprintf("Service '%s' is up again", service.Name)
 	return n.send(service, message)
 }
 
-func (n *EMailNotifier) SendFailure(service model.Service, failure model.Failure) error {
+func (n *EMailNotifier) SendServiceIsDownNotification(service model.Service, failure model.Failure) error {
 	message := fmt.Sprintf("Service '%s' is down.\nReason: %s", service.Name, failure.Reason)
 	return n.send(service, message)
 }

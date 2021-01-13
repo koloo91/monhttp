@@ -16,7 +16,7 @@ type NotificationSystem struct {
 func NewNotificationSystem() *NotificationSystem {
 	return &NotificationSystem{
 		notifiers:         make([]model.Notify, 0),
-		notificationQueue: make(chan Notification, 100),
+		notificationQueue: make(chan Notification, 1024),
 	}
 }
 
@@ -43,9 +43,15 @@ func (n *NotificationSystem) Start() {
 	go func() {
 		for notification := range n.notificationQueue {
 			for _, notifier := range n.getEnabledNotifiers() {
-				log.Printf("Sending notification using '%s' notifier", notifier.GetId())
-				if err := notifier.SendFailure(notification.Service, notification.Failure); err != nil {
-					log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
+				log.Infof("Sending notification using '%s' notifier", notifier.GetId())
+				if notification.IsUpNotification {
+					if err := notifier.SendServiceIsUpNotification(notification.Service); err != nil {
+						log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
+					}
+				} else {
+					if err := notifier.SendServiceIsDownNotification(notification.Service, notification.Failure); err != nil {
+						log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
+					}
 				}
 			}
 		}
@@ -64,6 +70,8 @@ func (n *NotificationSystem) getEnabledNotifiers() []model.Notify {
 
 func (n *NotificationSystem) AddNotification(notification Notification) {
 	go func() {
+		logFields := log.WithFields(log.Fields{"serviceId": notification.Service.Id, "isUpNotification": notification.IsUpNotification})
+		logFields.Infof("Adding notification to notification queu")
 		// add notification non blocking
 		n.notificationQueue <- notification
 	}()
@@ -74,15 +82,17 @@ func (n *NotificationSystem) GetNotifiers() []model.Notify {
 }
 
 type Notification struct {
-	Id      string
-	Service model.Service
-	Failure model.Failure
+	Id               string
+	Service          model.Service
+	IsUpNotification bool
+	Failure          model.Failure
 }
 
-func NewNotification(service model.Service, failure model.Failure) Notification {
+func NewNotification(service model.Service, isUpNotification bool, failure model.Failure) Notification {
 	return Notification{
-		Id:      uuid.New().String(),
-		Service: service,
-		Failure: failure,
+		Id:               uuid.New().String(),
+		Service:          service,
+		IsUpNotification: isUpNotification,
+		Failure:          failure,
 	}
 }
