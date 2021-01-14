@@ -51,4 +51,20 @@ export class SettingsComponent implements OnInit {
         console.log
       );
   }
+
+  testUpTemplate(): void {
+    this.notifierService.testUpTemplate(this.selectedNotifier.id, this.notifierFormGroup.value)
+      .subscribe(
+        console.log,
+        console.log
+      );
+  }
+
+  testDownTemplate(): void {
+    this.notifierService.testDownTemplate(this.selectedNotifier.id, this.notifierFormGroup.value)
+      .subscribe(
+        console.log,
+        console.log
+      );
+  }
 }

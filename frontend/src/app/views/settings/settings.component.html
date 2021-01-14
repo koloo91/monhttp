@@ -34,6 +34,18 @@
         </form>
       </mat-card-content>
       <mat-card-actions align="right">
+        <button mat-raised-button
+                (click)="testUpTemplate()"
+                [disabled]="!this.notifierFormGroup.valid">
+          Test up message
+        </button>
+
+        <button mat-raised-button
+                (click)="testDownTemplate()"
+                [disabled]="!this.notifierFormGroup.valid">
+          Test down message
+        </button>
+
         <button mat-raised-button color="accent"
                 (click)="updateNotifier()"
                 [disabled]="!this.notifierFormGroup.valid">

@@ -68,6 +68,8 @@ func SetupRoutes() *gin.Engine {
 	{
 		apiGroup.GET("/notifiers", getNotifiers)
 		apiGroup.PUT("/notifiers/:id", updateNotifier)
+		apiGroup.POST("/notifiers/:id/test/up", testNotifierUpTemplate)
+		apiGroup.POST("/notifiers/:id/test/down", testNotifierDownTemplate)
 	}
 
 	return router

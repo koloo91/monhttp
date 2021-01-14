@@ -23,4 +23,12 @@ export class NotifierService {
   put(notifierId: string, data: any): Observable<Notifier> {
     return this.http.put<Notifier>(`/api/notifiers/${notifierId}`, data);
   }
+
+  testUpTemplate(notifierId: string, data: any): Observable<void> {
+    return this.http.post<void>(`/api/notifiers/${notifierId}/test/up`, data)
+  }
+
+  testDownTemplate(notifierId: string, data: any): Observable<void> {
+    return this.http.post<void>(`/api/notifiers/${notifierId}/test/down`, data)
+  }
 }

@@ -32,3 +32,41 @@ func updateNotifier(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, "")
 }
+
+func testNotifierUpTemplate(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var body map[string]interface{}
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		log.Errorf("Unable to bind json body: '%s'", err)
+		ctx.JSON(http.StatusBadRequest, toApiError(err))
+		return
+	}
+
+	if err := service.TestNotifierUpTemplate(id, body); err != nil {
+		log.Errorf("Unable to test notifier '%s' - '%s'", id, err)
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "")
+}
+
+func testNotifierDownTemplate(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var body map[string]interface{}
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		log.Errorf("Unable to bind json body: '%s'", err)
+		ctx.JSON(http.StatusBadRequest, toApiError(err))
+		return
+	}
+
+	if err := service.TestNotifierDownTemplate(id, body); err != nil {
+		log.Errorf("Unable to update notifier '%s' - '%s'", id, err)
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "")
+}

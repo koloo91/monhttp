@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+const (
+	defaultUpTemplate   = "Service <b>'{{.Name}}'</b> is up again!"
+	defaultDownTemplate = "Service <b>'{{.Name}}'</b> is down. Reason: '{{.Reason}}' at {{.Date}}"
+)
+
 type NotificationSystem struct {
 	notifiers         []model.Notify
 	notificationQueue chan Notification
@@ -29,8 +34,8 @@ func (n *NotificationSystem) SetupDefaultNotifier() {
 
 	load := func() {
 		log.Info("Adding notifiers")
-		n.notifiers = append(n.notifiers, NewEMailNotifier())
-		n.notifiers = append(n.notifiers, NewTelegramNotifier())
+		n.notifiers = append(n.notifiers, NewEMailNotifier(viper.GetViper()))
+		n.notifiers = append(n.notifiers, NewTelegramNotifier(viper.GetViper()))
 	}
 	load()
 
@@ -40,12 +45,6 @@ func (n *NotificationSystem) SetupDefaultNotifier() {
 		n.notifiers = make([]model.Notify, 0)
 		load()
 	})
-}
-
-type templateData struct {
-	Name   string
-	Date   string
-	Reason string
 }
 
 func (n *NotificationSystem) Start() {
@@ -68,7 +67,7 @@ func (n *NotificationSystem) Start() {
 					return
 				}
 
-				data := templateData{
+				data := model.TemplateData{
 					Name:   notification.Service.Name,
 					Date:   time.Now().Format(time.RFC3339),
 					Reason: notification.Failure.Reason,

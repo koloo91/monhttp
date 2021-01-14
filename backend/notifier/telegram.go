@@ -16,17 +16,21 @@ type TelegramNotifier struct {
 	Channel  string
 }
 
-func (n *TelegramNotifier) GetId() string {
-	return n.Id
-}
-
-func NewTelegramNotifier() *TelegramNotifier {
+func NewTelegramNotifier(store *viper.Viper) *TelegramNotifier {
 	data := make(map[string]interface{})
-	data["enabled"] = viper.GetBool("NOTIFIER_TELEGRAM_ENABLED")
-	data["apiToken"] = viper.GetString("NOTIFIER_TELEGRAM_APITOKEN")
-	data["channel"] = viper.GetString("NOTIFIER_TELEGRAM_CHANNEL")
-	data["SERVICE_UP_TEMPLATE"] = viper.GetString("NOTIFIER_TELEGRAM_SERVICE_UP_TEMPLATE")
-	data["SERVICE_DOWN_TEMPLATE"] = viper.GetString("NOTIFIER_TELEGRAM_SERVICE_DOWN_TEMPLATE")
+	data["enabled"] = store.GetBool("NOTIFIER_TELEGRAM_ENABLED")
+	data["apiToken"] = store.GetString("NOTIFIER_TELEGRAM_APITOKEN")
+	data["channel"] = store.GetString("NOTIFIER_TELEGRAM_CHANNEL")
+
+	data["SERVICE_UP_TEMPLATE"] = store.GetString("NOTIFIER_TELEGRAM_SERVICE_UP_TEMPLATE")
+	if value, exists := data["SERVICE_UP_TEMPLATE"]; !exists || len(value.(string)) == 0 {
+		data["SERVICE_UP_TEMPLATE"] = defaultUpTemplate
+	}
+
+	data["SERVICE_DOWN_TEMPLATE"] = store.GetString("NOTIFIER_TELEGRAM_SERVICE_DOWN_TEMPLATE")
+	if value, exists := data["SERVICE_DOWN_TEMPLATE"]; !exists || len(value.(string)) == 0 {
+		data["SERVICE_DOWN_TEMPLATE"] = defaultDownTemplate
+	}
 
 	return &TelegramNotifier{
 		Notifier: model.Notifier{
@@ -72,8 +76,8 @@ func NewTelegramNotifier() *TelegramNotifier {
 				},
 			},
 		},
-		ApiToken: viper.GetString("NOTIFIER_TELEGRAM_APITOKEN"),
-		Channel:  viper.GetString("NOTIFIER_TELEGRAM_CHANNEL"),
+		ApiToken: store.GetString("NOTIFIER_TELEGRAM_APITOKEN"),
+		Channel:  store.GetString("NOTIFIER_TELEGRAM_CHANNEL"),
 	}
 }
 
@@ -104,6 +108,10 @@ func (n *TelegramNotifier) send(message string) error {
 	log.Println(string(contentByte))
 
 	return nil
+}
+
+func (n *TelegramNotifier) GetId() string {
+	return n.Id
 }
 
 func (n *TelegramNotifier) IsEnabled() bool {
