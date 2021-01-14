@@ -1,5 +1,5 @@
 <div id="settings-view">
-  <div class="notifiers-list" >
+  <div class="notifiers-list">
     <h3 class="mat-title">Notifiers</h3>
     <mat-selection-list multiple="false" *ngIf="notifiers$ | async as notifiers">
       <mat-list-option class="notifier-entry" *ngFor="let notifier of notifiers" (click)="notifierSelected(notifier)">
@@ -18,13 +18,17 @@
             <p class="mat-subheading-1">{{form.title}}</p>
             <mat-slide-toggle *ngIf="form.type === 'switch'"
                               [formControlName]="form.formControlName"></mat-slide-toggle>
-            <mat-form-field *ngIf="form.type === 'text' || form.type === 'number' || form.type === 'password'">
+            <mat-form-field *ngIf="form.type === 'text' || form.type === 'number' || form.type === 'password' || form.type === 'textarea'">
               <mat-label>{{form.title}}</mat-label>
-              <input matInput
+              <input matInput *ngIf="form.type !== 'textarea'"
                      [type]="form.type"
                      [placeholder]="form.placeholder"
                      [formControlName]="form.formControlName"
                      [required]="form.required">
+              <textarea matInput *ngIf="form.type === 'textarea'"
+                        [placeholder]="form.placeholder"
+                        [formControlName]="form.formControlName"
+                        [required]="form.required"></textarea>
             </mat-form-field>
           </div>
         </form>

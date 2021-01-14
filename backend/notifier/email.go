@@ -17,10 +17,6 @@ type EMailNotifier struct {
 	Auth smtp.Auth
 }
 
-func (n *EMailNotifier) GetId() string {
-	return n.Id
-}
-
 func NewEMailNotifier() *EMailNotifier {
 	data := make(map[string]interface{})
 	data["enabled"] = viper.GetBool("NOTIFIER_EMAIL_ENABLED")
@@ -29,6 +25,9 @@ func NewEMailNotifier() *EMailNotifier {
 	data["from"] = viper.GetString("NOTIFIER_EMAIL_FROM")
 	data["password"] = viper.GetString("NOTIFIER_EMAIL_PASSWORD")
 	data["to"] = strings.Join(viper.GetStringSlice("NOTIFIER_EMAIL_TO"), ",")
+	data["password"] = viper.GetString("NOTIFIER_EMAIL_PASSWORD")
+	data["SERVICE_UP_TEMPLATE"] = viper.GetString("NOTIFIER_EMAIL_SERVICE_UP_TEMPLATE")
+	data["SERVICE_DOWN_TEMPLATE"] = viper.GetString("NOTIFIER_EMAIL_SERVICE_DOWN_TEMPLATE")
 
 	username := viper.GetString("NOTIFIER_EMAIL_FROM")
 	password := viper.GetString("NOTIFIER_EMAIL_PASSWORD")
@@ -84,6 +83,20 @@ func NewEMailNotifier() *EMailNotifier {
 					Placeholder:     "gululu@example.com,example@example.com",
 					Required:        true,
 				},
+				{
+					Type:            "textarea",
+					Title:           "Up template",
+					FormControlName: "SERVICE_UP_TEMPLATE",
+					Placeholder:     "Service {{.Name}} is up",
+					Required:        true,
+				},
+				{
+					Type:            "textarea",
+					Title:           "Down template",
+					FormControlName: "SERVICE_DOWN_TEMPLATE",
+					Placeholder:     "Service {{.Name}} is down",
+					Required:        true,
+				},
 			},
 		},
 		Host: viper.GetString("NOTIFIER_EMAIL_HOST"),
@@ -94,13 +107,7 @@ func NewEMailNotifier() *EMailNotifier {
 	}
 }
 
-func (n *EMailNotifier) SendServiceIsUpNotification(service model.Service) error {
-	message := fmt.Sprintf("Service '%s' is up again", service.Name)
-	return n.send(service, message)
-}
-
-func (n *EMailNotifier) SendServiceIsDownNotification(service model.Service, failure model.Failure) error {
-	message := fmt.Sprintf("Service '%s' is down.\nReason: %s", service.Name, failure.Reason)
+func (n *EMailNotifier) SendNotification(service model.Service, message string) error {
 	return n.send(service, message)
 }
 
@@ -122,6 +129,10 @@ func (n *EMailNotifier) send(service model.Service, message string) error {
 	return smtp.SendMail(fmt.Sprintf("%s:%d", n.Host, n.Port), n.Auth, n.From, n.To, []byte(eMailMessage))
 }
 
+func (n *EMailNotifier) GetId() string {
+	return n.Id
+}
+
 func (n *EMailNotifier) IsEnabled() bool {
 	return n.Enabled
 }
@@ -136,4 +147,18 @@ func (n *EMailNotifier) GetName() string {
 
 func (n *EMailNotifier) GetData() map[string]interface{} {
 	return n.Data
+}
+
+func (n *EMailNotifier) GetServiceUpNotificationTemplate() string {
+	if data, exists := n.Data["SERVICE_UP_TEMPLATE"]; exists {
+		return data.(string)
+	}
+	return "Service <b>'{{.Name}}'</b> is up again!"
+}
+
+func (n *EMailNotifier) GetServiceDownNotificationTemplate() string {
+	if data, exists := n.Data["SERVICE_DOWN_TEMPLATE"]; exists {
+		return data.(string)
+	}
+	return "Service <b>'{{.Name}}'</b> is down. Reason: '{{.Reason}}' at {{.Date}}"
 }

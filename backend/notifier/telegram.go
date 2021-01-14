@@ -25,6 +25,8 @@ func NewTelegramNotifier() *TelegramNotifier {
 	data["enabled"] = viper.GetBool("NOTIFIER_TELEGRAM_ENABLED")
 	data["apiToken"] = viper.GetString("NOTIFIER_TELEGRAM_APITOKEN")
 	data["channel"] = viper.GetString("NOTIFIER_TELEGRAM_CHANNEL")
+	data["SERVICE_UP_TEMPLATE"] = viper.GetString("NOTIFIER_TELEGRAM_SERVICE_UP_TEMPLATE")
+	data["SERVICE_DOWN_TEMPLATE"] = viper.GetString("NOTIFIER_TELEGRAM_SERVICE_DOWN_TEMPLATE")
 
 	return &TelegramNotifier{
 		Notifier: model.Notifier{
@@ -54,6 +56,20 @@ func NewTelegramNotifier() *TelegramNotifier {
 					Placeholder:     "710144235",
 					Required:        true,
 				},
+				{
+					Type:            "textarea",
+					Title:           "Up template",
+					FormControlName: "SERVICE_UP_TEMPLATE",
+					Placeholder:     "Service {{.Name}} is up",
+					Required:        true,
+				},
+				{
+					Type:            "textarea",
+					Title:           "Down template",
+					FormControlName: "SERVICE_DOWN_TEMPLATE",
+					Placeholder:     "Service {{.Name}} is down",
+					Required:        true,
+				},
 			},
 		},
 		ApiToken: viper.GetString("NOTIFIER_TELEGRAM_APITOKEN"),
@@ -61,15 +77,7 @@ func NewTelegramNotifier() *TelegramNotifier {
 	}
 }
 
-func (n *TelegramNotifier) SendServiceIsUpNotification(service model.Service) error {
-	// TODO: prepare message before
-	// TODO: get template
-	message := fmt.Sprintf("Service '%s' is up again", service.Name)
-	return n.send(message)
-}
-
-func (n *TelegramNotifier) SendServiceIsDownNotification(service model.Service, failure model.Failure) error {
-	message := fmt.Sprintf("Service '%s' is down.\nReason: %s", service.Name, failure.Reason)
+func (n *TelegramNotifier) SendNotification(service model.Service, message string) error {
 	return n.send(message)
 }
 
@@ -80,7 +88,7 @@ func (n *TelegramNotifier) send(message string) error {
 	v.Set("text", message)
 	v.Encode()
 
-	apiEndpoint := fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage?%s", n.ApiToken, v.Encode())
+	apiEndpoint := fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage?%s&parse_mode=HTML", n.ApiToken, v.Encode())
 
 	response, err := http.Get(apiEndpoint)
 	if err != nil {
@@ -112,4 +120,18 @@ func (n *TelegramNotifier) GetName() string {
 
 func (n *TelegramNotifier) GetData() map[string]interface{} {
 	return n.Data
+}
+
+func (n *TelegramNotifier) GetServiceUpNotificationTemplate() string {
+	if data, exists := n.Data["SERVICE_UP_TEMPLATE"]; exists {
+		return data.(string)
+	}
+	return "Service <b>'{{.Name}}'</b> is up again!"
+}
+
+func (n *TelegramNotifier) GetServiceDownNotificationTemplate() string {
+	if data, exists := n.Data["SERVICE_DOWN_TEMPLATE"]; exists {
+		return data.(string)
+	}
+	return "Service <b>'{{.Name}}'</b> is down. Reason: '{{.Reason}}' at {{.Date}}"
 }

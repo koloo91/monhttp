@@ -11,6 +11,8 @@ HTML/CSS/Javascript files. You can even run `monhttp` on your Raspberry Pi.
 
 `monhttp` can notify you via email or Telegram when a service is unavailable. More notification types coming soon.
 
+It is possible to use your own template for notifications. The [golang template engine](https://golang.org/pkg/text/template/#example_Template) is used for this purpose. Possible variables are `{{.Name}}`, `{{.Reason}}` and `{{.Date}}`.
+
 ## Run on Docker
 
 Use the [official Docker image](https://hub.docker.com/r/koloooo/monhttp) to run monhttp in seconds.

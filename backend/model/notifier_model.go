@@ -33,12 +33,13 @@ type NotificationFormVo struct {
 
 type Notify interface {
 	GetId() string
-	SendServiceIsUpNotification(Service) error
-	SendServiceIsDownNotification(Service, Failure) error
+	SendNotification(Service, string) error
 	IsEnabled() bool
 	GetForms() []NotificationForm
 	GetName() string
 	GetData() map[string]interface{}
+	GetServiceUpNotificationTemplate() string
+	GetServiceDownNotificationTemplate() string
 }
 
 func MapNotifierToVo(n Notify) NotifierVo {

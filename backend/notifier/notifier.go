@@ -1,11 +1,14 @@
 package notifier
 
 import (
+	"bytes"
 	"github.com/fsnotify/fsnotify"
 	"github.com/google/uuid"
 	"github.com/koloo91/monhttp/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"html/template"
+	"time"
 )
 
 type NotificationSystem struct {
@@ -39,19 +42,46 @@ func (n *NotificationSystem) SetupDefaultNotifier() {
 	})
 }
 
+type templateData struct {
+	Name   string
+	Date   string
+	Reason string
+}
+
 func (n *NotificationSystem) Start() {
 	go func() {
 		for notification := range n.notificationQueue {
 			for _, notifier := range n.getEnabledNotifiers() {
 				log.Infof("Sending notification using '%s' notifier", notifier.GetId())
+
+				var tmpl *template.Template
+				var err error
+
 				if notification.IsUpNotification {
-					if err := notifier.SendServiceIsUpNotification(notification.Service); err != nil {
-						log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
-					}
+					tmpl, err = template.New(notifier.GetId()).Parse(notifier.GetServiceUpNotificationTemplate())
 				} else {
-					if err := notifier.SendServiceIsDownNotification(notification.Service, notification.Failure); err != nil {
-						log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
-					}
+					tmpl, err = template.New(notifier.GetId()).Parse(notifier.GetServiceDownNotificationTemplate())
+				}
+
+				if err != nil {
+					log.Errorf("Unable to parse template for notifier '%s' - '%s'", notifier.GetId(), err)
+					return
+				}
+
+				data := templateData{
+					Name:   notification.Service.Name,
+					Date:   time.Now().Format(time.RFC3339),
+					Reason: notification.Failure.Reason,
+				}
+
+				var buffer bytes.Buffer
+				if err := tmpl.Execute(&buffer, data); err != nil {
+					log.Errorf("Unable to execute template for notifier '%s' - '%s'", notifier.GetId(), err)
+					return
+				}
+
+				if err := notifier.SendNotification(notification.Service, buffer.String()); err != nil {
+					log.Errorf("Unable to send notification with notifier '%s' - '%s'", notifier.GetId(), err)
 				}
 			}
 		}
