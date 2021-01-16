@@ -7,6 +7,8 @@ import {Observable, Subscription} from 'rxjs';
 import {Service, ServiceType} from '../../models/service.model';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ApiError} from '../../models/api-error.model';
+import {NotifierService} from '../../services/notifier.service';
+import {Notifier} from '../../models/notifier.model';
 
 @Component({
   selector: 'app-edit-service',
@@ -34,7 +36,8 @@ export class EditServiceComponent implements OnInit {
 
     enableNotifications: new FormControl(true),
     notifyAfterNumberOfFailures: new FormControl(2, [Validators.min(0), Validators.max(20)]),
-    continuouslySendNotifications: new FormControl(false)
+    continuouslySendNotifications: new FormControl(false),
+    notifiers: new FormControl(['global'])
   });
 
   selectedServiceType: ServiceType = 'HTTP';
@@ -42,9 +45,12 @@ export class EditServiceComponent implements OnInit {
   isLoading = false;
   serviceId = '';
 
+  notifiers$: Observable<Notifier[]>;
+
   private serviceTypeSubscription: Subscription;
 
   constructor(private serviceService: ServiceService,
+              private notifierService: NotifierService,
               private errorService: ErrorService,
               private router: Router,
               private route: ActivatedRoute) {
@@ -62,6 +68,14 @@ export class EditServiceComponent implements OnInit {
           this.setFormGroupValues(service);
         }),
         tap(() => this.isLoading = false)
+      );
+
+    this.notifiers$ = this.notifierService.list()
+      .pipe(
+        map(notifiers => {
+          notifiers.splice(0, 0, {id: 'global', name: 'Global', data: null, form: []});
+          return notifiers;
+        })
       );
 
     this.serviceTypeSubscription = this.serviceType.valueChanges
@@ -88,6 +102,7 @@ export class EditServiceComponent implements OnInit {
     this.formGroup.get('enableNotifications').setValue(service.enableNotifications);
     this.formGroup.get('notifyAfterNumberOfFailures').setValue(service.notifyAfterNumberOfFailures);
     this.formGroup.get('continuouslySendNotifications').setValue(service.continuouslySendNotifications);
+    this.formGroup.get('notifiers').setValue(service.notifiers);
   }
 
   updateService(): void {
