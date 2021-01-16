@@ -10,11 +10,12 @@ import (
 
 type EMailNotifier struct {
 	model.Notifier
-	Host string
-	Port int
-	From string
-	To   []string
-	Auth smtp.Auth
+	Host    string
+	Port    int
+	From    string
+	To      []string
+	Subject string
+	Auth    smtp.Auth
 }
 
 func NewEMailNotifier(store *viper.Viper) *EMailNotifier {
@@ -24,8 +25,8 @@ func NewEMailNotifier(store *viper.Viper) *EMailNotifier {
 	data["port"] = store.GetInt("NOTIFIER_EMAIL_PORT")
 	data["from"] = store.GetString("NOTIFIER_EMAIL_FROM")
 	data["password"] = store.GetString("NOTIFIER_EMAIL_PASSWORD")
+	data["subject"] = store.GetString("NOTIFIER_EMAIL_SUBJECT")
 	data["to"] = strings.Join(store.GetStringSlice("NOTIFIER_EMAIL_TO"), ",")
-	data["password"] = store.GetString("NOTIFIER_EMAIL_PASSWORD")
 
 	data["SERVICE_UP_TEMPLATE"] = store.GetString("NOTIFIER_EMAIL_SERVICE_UP_TEMPLATE")
 	if value, exists := data["SERVICE_UP_TEMPLATE"]; !exists || len(value.(string)) == 0 {
@@ -92,6 +93,13 @@ func NewEMailNotifier(store *viper.Viper) *EMailNotifier {
 					Required:        true,
 				},
 				{
+					Type:            "text",
+					Title:           "Subject",
+					FormControlName: "subject",
+					Placeholder:     "Service notification from monhttp",
+					Required:        true,
+				},
+				{
 					Type:            "textarea",
 					Title:           "Up template",
 					FormControlName: "SERVICE_UP_TEMPLATE",
@@ -107,11 +115,12 @@ func NewEMailNotifier(store *viper.Viper) *EMailNotifier {
 				},
 			},
 		},
-		Host: store.GetString("NOTIFIER_EMAIL_HOST"),
-		Port: store.GetInt("NOTIFIER_EMAIL_PORT"),
-		From: store.GetString("NOTIFIER_EMAIL_FROM"),
-		To:   strings.Split(store.GetString("NOTIFIER_EMAIL_TO"), ","),
-		Auth: auth,
+		Host:    store.GetString("NOTIFIER_EMAIL_HOST"),
+		Port:    store.GetInt("NOTIFIER_EMAIL_PORT"),
+		From:    store.GetString("NOTIFIER_EMAIL_FROM"),
+		To:      strings.Split(store.GetString("NOTIFIER_EMAIL_TO"), ","),
+		Subject: store.GetString("NOTIFIER_EMAIL_SUBJECT"),
+		Auth:    auth,
 	}
 }
 
@@ -123,7 +132,7 @@ func (n *EMailNotifier) send(service model.Service, message string) error {
 	header := make(map[string]string)
 	header["From"] = n.From
 	header["To"] = strings.Join(n.To, ", ")
-	header["Subject"] = fmt.Sprintf("monhttp: Service '%s' status notification", service.Name)
+	header["Subject"] = n.Subject
 	header["MIME-version"] = "1.0"
 	header["Content-Type"] = "text/html; charset=\"utf-8\""
 
