@@ -3,9 +3,7 @@ package controller
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/koloo91/monhttp/model"
 	"github.com/koloo91/monhttp/service"
 	log "github.com/sirupsen/logrus"
@@ -16,10 +14,10 @@ func postService(ctx *gin.Context) {
 	var vo model.ServiceVo
 	if err := ctx.ShouldBindJSON(&vo); err != nil {
 		log.Errorf("Unable to bind json body: '%s'", err)
-		for _, fieldErr := range err.(validator.ValidationErrors) {
-			ctx.JSON(http.StatusBadRequest, fmt.Sprint(fieldError{fieldErr}))
-			return // exit on first error
-		}
+		//for _, fieldErr := range err.(validator.ValidationErrors) {
+		//	ctx.JSON(http.StatusBadRequest, fmt.Sprint(fieldError{fieldErr}))
+		//	return // exit on first error
+		//}
 		ctx.JSON(http.StatusBadRequest, toApiError(err))
 		return
 	}

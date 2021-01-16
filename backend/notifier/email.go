@@ -123,7 +123,7 @@ func (n *EMailNotifier) send(service model.Service, message string) error {
 	header := make(map[string]string)
 	header["From"] = n.From
 	header["To"] = strings.Join(n.To, ", ")
-	header["Subject"] = fmt.Sprintf("monhttp: Service '%s' is down", service.Name)
+	header["Subject"] = fmt.Sprintf("monhttp: Service '%s' status notification", service.Name)
 	header["MIME-version"] = "1.0"
 	header["Content-Type"] = "text/html; charset=\"utf-8\""
 

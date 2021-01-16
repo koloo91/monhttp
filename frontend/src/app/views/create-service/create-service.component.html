@@ -138,6 +138,16 @@
         </div>
 
         <div *ngIf="enableNotifications">
+          <div class="input-row" *ngIf="notifiers$ | async as notifiers">
+            <p class="mat-subheading-1">Notifiers</p>
+            <mat-form-field appearance="outline">
+              <mat-label>Notifiers</mat-label>
+              <mat-select formControlName="notifiers" multiple>
+                <mat-option *ngFor="let notifier of notifiers" [value]="notifier.id">{{notifier.name}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
           <div class="input-row">
             <p class="mat-subheading-1">Notify after failures</p>
             <mat-form-field appearance="outline">

@@ -63,6 +63,7 @@ func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnCreated() {
 		"enableNotifications":           true,
 		"notifyAfterNumberOfFailures":   2,
 		"continuouslySendNotifications": true,
+		"notifiers":                     []string{"global"},
 	})
 	assert.Nil(suite.T(), err)
 
@@ -93,6 +94,7 @@ func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnCreated() {
 	assert.Equal(suite.T(), true, responseBody["enableNotifications"])
 	assert.Equal(suite.T(), float64(2), responseBody["notifyAfterNumberOfFailures"])
 	assert.Equal(suite.T(), true, responseBody["continuouslySendNotifications"])
+	assert.Equal(suite.T(), []interface{}{"global"}, responseBody["notifiers"])
 }
 
 func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnErrorIfWrongType() {
@@ -125,5 +127,5 @@ func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnErrorIfWrongType(
 	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
-	assert.Equal(suite.T(), "", responseBody["message"])
+	assert.Equal(suite.T(), "Key: 'ServiceVo.Type' Error:Field validation for 'Type' failed on the 'oneof' tag", responseBody["message"])
 }

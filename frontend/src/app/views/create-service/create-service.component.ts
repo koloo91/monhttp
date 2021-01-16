@@ -1,12 +1,14 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {Service, ServiceType} from '../../models/service.model';
-import {Subscription} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {ServiceService} from '../../services/service.service';
 import {Router} from '@angular/router';
 import {ErrorService} from '../../services/error.service';
 import {ApiError} from '../../models/api-error.model';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
+import {NotifierService} from '../../services/notifier.service';
+import {Notifier} from '../../models/notifier.model';
 
 @Component({
   selector: 'app-create-service',
@@ -32,21 +34,34 @@ export class CreateServiceComponent implements OnInit, OnDestroy {
 
     enableNotifications: new FormControl(true),
     notifyAfterNumberOfFailures: new FormControl(2, [Validators.min(0), Validators.max(20)]),
-    continuouslySendNotifications: new FormControl(false)
+    continuouslySendNotifications: new FormControl(false),
+    notifiers: new FormControl(['global'])
   });
 
   selectedServiceType: ServiceType = 'HTTP';
 
   isLoading = false;
 
+  notifiers$: Observable<Notifier[]>;
+
   private serviceTypeSubscription: Subscription;
 
   constructor(private serviceService: ServiceService,
-              private router: Router,
-              private errorService: ErrorService) {
+              private errorService: ErrorService,
+              private notifierService: NotifierService,
+              private router: Router) {
+
   }
 
   ngOnInit(): void {
+    this.notifiers$ = this.notifierService.list()
+      .pipe(
+        map(notifiers => {
+          notifiers.splice(0, 0, {id: 'global', name: 'Global', data: null, form: []});
+          return notifiers;
+        })
+      );
+
     this.serviceTypeSubscription = this.serviceType.valueChanges
       .subscribe((serviceType) => this.selectedServiceType = serviceType);
   }

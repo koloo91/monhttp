@@ -18,6 +18,7 @@ export interface Service {
   enableNotifications: boolean;
   notifyAfterNumberOfFailures: number;
   continuouslySendNotifications: boolean;
+  notifiers: string[];
   createdAt?: string;
   updatedAt?: string;
 }
