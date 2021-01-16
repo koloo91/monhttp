@@ -29,6 +29,7 @@ type Service struct {
 	EnableNotifications           bool
 	NotifyAfterNumberOfFailures   int
 	ContinuouslySendNotifications bool
+	Notifiers                     []string
 	CreatedAt                     time.Time
 	UpdatedAt                     time.Time
 }
@@ -50,6 +51,7 @@ type ServiceVo struct {
 	EnableNotifications           bool        `json:"enableNotifications"`
 	NotifyAfterNumberOfFailures   int         `json:"notifyAfterNumberOfFailures"`
 	ContinuouslySendNotifications bool        `json:"continuouslySendNotifications"`
+	Notifiers                     []string    `json:"notifiers"`
 	CreatedAt                     time.Time   `json:"createdAt"`
 	UpdatedAt                     time.Time   `json:"updatedAt"`
 }
@@ -72,6 +74,7 @@ func MapServiceVoToEntity(vo ServiceVo) Service {
 		EnableNotifications:           vo.EnableNotifications,
 		NotifyAfterNumberOfFailures:   vo.NotifyAfterNumberOfFailures,
 		ContinuouslySendNotifications: vo.ContinuouslySendNotifications,
+		Notifiers:                     vo.Notifiers,
 		CreatedAt:                     time.Now(),
 		UpdatedAt:                     time.Now(),
 	}
@@ -95,6 +98,7 @@ func MapServiceEntityToVo(entity Service) ServiceVo {
 		EnableNotifications:           entity.EnableNotifications,
 		NotifyAfterNumberOfFailures:   entity.NotifyAfterNumberOfFailures,
 		ContinuouslySendNotifications: entity.ContinuouslySendNotifications,
+		Notifiers:                     entity.Notifiers,
 		CreatedAt:                     entity.CreatedAt,
 		UpdatedAt:                     entity.UpdatedAt,
 	}

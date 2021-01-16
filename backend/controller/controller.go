@@ -16,7 +16,7 @@ import (
 )
 
 func SetupRoutes() *gin.Engine {
-	binding.Validator = new(defaultValidator)
+	//binding.Validator = new(defaultValidator)
 
 	router := gin.New()
 	router.Use(gin.Logger())
