@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ServiceService} from '../../services/service.service';
-import {forkJoin, Observable, of, Subscription} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable, of, Subscription} from 'rxjs';
 import {Service} from '../../models/service.model';
 import {Router} from '@angular/router';
 import {ErrorService} from '../../services/error.service';
@@ -9,6 +9,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {ConfirmServiceDeleteDialogComponent} from '../../components/dialogs/confirm-service-delete-dialog/confirm-service-delete-dialog.component';
 import {CheckService} from '../../services/check.service';
 import {FailureService} from '../../services/failure.service';
+import {PageEvent} from '@angular/material/paginator';
 
 interface ServiceWithStatusAndFailures extends Service {
   isOnline: boolean;
@@ -30,12 +31,24 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   subscriptions: Subscription[] = [];
 
+  servicesPageSize = 10;
+  servicesPerPage = [5, 10, 25, 50];
+  servicesTotalCount = 0;
+
+  servicesPaginatorEventSubject = new BehaviorSubject<PageEvent>({
+    length: 0,
+    pageSize: this.servicesPageSize,
+    pageIndex: 0
+  });
+  servicesPaginatorEvent$: Observable<PageEvent>;
+
   constructor(private serviceService: ServiceService,
               private checkService: CheckService,
               private failureService: FailureService,
               private errorService: ErrorService,
               private router: Router,
               public dialog: MatDialog) {
+    this.servicesPaginatorEvent$ = this.servicesPaginatorEventSubject.asObservable();
   }
 
 
@@ -48,10 +61,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   loadServices() {
-    this.isLoading = true;
-
-    this.dataSource$ = this.serviceService.list()
+    this.dataSource$ = this.servicesPaginatorEvent$
       .pipe(
+        tap(() => this.isLoading = true),
+        switchMap(pageEvent => this.serviceService.list(pageEvent.pageSize, pageEvent.pageIndex)),
+        map(wrapper => {
+          this.servicesTotalCount = wrapper.totalCount;
+          return wrapper.data;
+        }),
         map(services => services.map(service => service as ServiceWithStatusAndFailures)),
         tap(() => this.isLoading = false)
       );
@@ -114,5 +131,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   onShowChartClick(id: string): void {
     this.router.navigate(['services', id]);
+  }
+
+  onServicePageChanged(pageEvent: PageEvent) {
+    this.servicesPaginatorEventSubject.next(pageEvent);
   }
 }

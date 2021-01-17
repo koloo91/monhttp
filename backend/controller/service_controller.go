@@ -10,6 +10,11 @@ import (
 	"net/http"
 )
 
+type GetServicesQueryParameter struct {
+	PageSize *int `form:"pageSize" binding:"required"`
+	Page     *int `form:"page" binding:"required"`
+}
+
 func postService(ctx *gin.Context) {
 	var vo model.ServiceVo
 	if err := ctx.ShouldBindJSON(&vo); err != nil {
@@ -35,15 +40,34 @@ func postService(ctx *gin.Context) {
 }
 
 func getServices(ctx *gin.Context) {
-	services, err := service.GetServices(ctx.Request.Context())
+	var queryParameter GetServicesQueryParameter
+	if err := ctx.ShouldBindQuery(&queryParameter); err != nil {
+		log.Errorf("Unable to get query parameter: '%s'", err)
+		ctx.JSON(http.StatusBadRequest, toApiError(err))
+		return
+	}
+
+	services, err := service.GetServices(ctx.Request.Context(), *queryParameter.PageSize, *queryParameter.Page)
 	if err != nil {
 		log.Errorf("Unable to get services from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))
 		return
 	}
 
-	vos := model.MapServiceEntitiesToVos(services)
-	ctx.JSON(http.StatusOK, model.ServiceWrapperVo{Data: vos})
+	servicesCount, err := service.GetServicesCount(ctx.Request.Context())
+	if err != nil {
+		log.Errorf("Unable to get is services count from database: '%s'", err)
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
+
+	serviceVos := model.MapServiceEntitiesToVos(services)
+	ctx.JSON(http.StatusOK, model.ServiceWrapperVo{
+		Data:       serviceVos,
+		TotalCount: servicesCount,
+		PageSize:   *queryParameter.PageSize,
+		Page:       *queryParameter.Page,
+	})
 }
 
 func getService(ctx *gin.Context) {

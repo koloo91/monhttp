@@ -9,7 +9,6 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -62,24 +61,15 @@ func ImportCsvData(ctx context.Context, file io.Reader) []model.ImportResult {
 		result = append(result, model.ImportResult{RowNumber: rowNumber, Service: service, Error: err})
 	}
 
-	var wg sync.WaitGroup
-
 	for _, entry := range result {
 		if entry.Error != nil {
 			continue
 		}
 
-		wg.Add(1)
-
-		go func(e *model.ImportResult) {
-			defer wg.Done()
-			createdService, err := CreateService(ctx, e.Service)
-			e.Service = createdService
-			e.Error = err
-		}(&entry)
+		createdService, err := CreateService(ctx, entry.Service)
+		entry.Service = createdService
+		entry.Error = err
 	}
-
-	wg.Wait()
 
 	return result
 }

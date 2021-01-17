@@ -18,11 +18,12 @@ const (
 )
 
 var (
-	insertServiceStatement     *sql.Stmt
-	selectServicesStatement    *sql.Stmt
-	selectServiceByIdStatement *sql.Stmt
-	updateServiceByIdStatement *sql.Stmt
-	deleteServiceByIdStatement *sql.Stmt
+	insertServiceStatement       *sql.Stmt
+	selectServicesStatement      *sql.Stmt
+	selectServicesCountStatement *sql.Stmt
+	selectServiceByIdStatement   *sql.Stmt
+	updateServiceByIdStatement   *sql.Stmt
+	deleteServiceByIdStatement   *sql.Stmt
 )
 
 func prepareServiceStatements() {
@@ -52,7 +53,16 @@ func prepareServiceStatements() {
        														   notifiers,
 															   created_at,
 															   updated_at
-														FROM service ORDER BY name;`)
+														FROM service
+																ORDER BY name
+																LIMIT $1 
+																OFFSET $2;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	selectServicesCountStatement, err = db.Prepare(`SELECT COUNT(id)
+												FROM service;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -138,9 +148,8 @@ func InsertServiceTx(ctx context.Context, tx *sql.Tx, service model.Service) err
 	return nil
 }
 
-// TODO: add paging
-func SelectServices(ctx context.Context) ([]model.Service, error) {
-	rows, err := selectServicesStatement.QueryContext(ctx)
+func SelectServices(ctx context.Context, limit, offset int) ([]model.Service, error) {
+	rows, err := selectServicesStatement.QueryContext(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +198,18 @@ func SelectServices(ctx context.Context) ([]model.Service, error) {
 	}
 
 	return result, nil
+}
+
+func SelectServicesCount(ctx context.Context) (int, error) {
+	row := selectServicesCountStatement.QueryRowContext(ctx)
+
+	var count int
+
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func SelectServiceById(ctx context.Context, serviceId string) (model.Service, error) {
