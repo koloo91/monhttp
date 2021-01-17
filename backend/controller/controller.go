@@ -24,6 +24,9 @@ func SetupRoutes() *gin.Engine {
 
 	router.Use(static.Serve("/", static.LocalFile("./public", false)))
 
+	// TODO: set via config
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
+
 	router.NoRoute(func(ctx *gin.Context) {
 		ctx.File("./public/index.html")
 	})
@@ -72,12 +75,23 @@ func SetupRoutes() *gin.Engine {
 		apiGroup.POST("/notifiers/:id/test/down", testNotifierDownTemplate)
 	}
 
+	{
+		apiGroup.POST("/import", importCsv)
+	}
+
 	return router
 }
 
 func toApiError(err error) model.ApiErrorVo {
 	return model.ApiErrorVo{
 		Message: err.Error(),
+	}
+}
+
+func toApiErrorWithErrors(err error, errors []interface{}) model.ApiErrorVo {
+	return model.ApiErrorVo{
+		Message: err.Error(),
+		Errors:  errors,
 	}
 }
 
