@@ -13,16 +13,5 @@
     flex-grow: 8;
   }
 
-  .input-row {
-    display: flex;
-    align-items: center;
 
-    p {
-      width: 30%;
-    }
-
-    mat-form-field, mat-slider {
-      width: 70%;
-    }
-  }
 }

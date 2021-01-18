@@ -34,7 +34,7 @@ func CreateService(ctx context.Context, service model.Service) (model.Service, e
 }
 
 func GetServices(ctx context.Context, pageSize, page int) ([]model.Service, error) {
-	return repository.SelectServices(ctx, pageSize, page)
+	return repository.SelectServices(ctx, pageSize, pageSize*page)
 }
 
 func GetServicesCount(ctx context.Context) (int, error) {

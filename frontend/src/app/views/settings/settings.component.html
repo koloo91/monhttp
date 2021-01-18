@@ -1,57 +1,19 @@
 <div id="settings-view">
   <div class="notifiers-list">
-    <h3 class="mat-title">Notifiers</h3>
-    <mat-selection-list multiple="false" *ngIf="notifiers$ | async as notifiers">
-      <mat-list-option class="notifier-entry" *ngFor="let notifier of notifiers" (click)="notifierSelected(notifier)">
+    <mat-selection-list [multiple]="false">
+      <div mat-subheader>General</div>
+      <mat-list-option class="notifier-entry" *ngFor="let notifier of (notifiers$ | async)"
+                     (click)="notifierSelected(notifier)">
+        {{notifier.name}}
+      </mat-list-option>
+      <div mat-subheader>Notifiers</div>
+      <mat-list-option class="notifier-entry" *ngFor="let notifier of (notifiers$ | async)"
+                     (click)="notifierSelected(notifier)">
         {{notifier.name}}
       </mat-list-option>
     </mat-selection-list>
   </div>
   <div class="notifiers-form">
-    <mat-card *ngIf="selectedNotifier && notifierFormGroup">
-      <mat-card-header>
-        <mat-card-title>{{selectedNotifier.name}}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <form [formGroup]="notifierFormGroup">
-          <div *ngFor="let form of selectedNotifier.form" class="input-row">
-            <p class="mat-subheading-1">{{form.title}}</p>
-            <mat-slide-toggle *ngIf="form.type === 'switch'"
-                              [formControlName]="form.formControlName"></mat-slide-toggle>
-            <mat-form-field *ngIf="form.type === 'text' || form.type === 'number' || form.type === 'password' || form.type === 'textarea'">
-              <mat-label>{{form.title}}</mat-label>
-              <input matInput *ngIf="form.type !== 'textarea'"
-                     [type]="form.type"
-                     [placeholder]="form.placeholder"
-                     [formControlName]="form.formControlName"
-                     [required]="form.required">
-              <textarea matInput *ngIf="form.type === 'textarea'"
-                        [placeholder]="form.placeholder"
-                        [formControlName]="form.formControlName"
-                        [required]="form.required"></textarea>
-            </mat-form-field>
-          </div>
-        </form>
-      </mat-card-content>
-      <mat-card-actions align="right">
-        <button mat-raised-button
-                (click)="testUpTemplate()"
-                [disabled]="!this.notifierFormGroup.valid">
-          Test up message
-        </button>
-
-        <button mat-raised-button
-                (click)="testDownTemplate()"
-                [disabled]="!this.notifierFormGroup.valid">
-          Test down message
-        </button>
-
-        <button mat-raised-button color="accent"
-                (click)="updateNotifier()"
-                [disabled]="!this.notifierFormGroup.valid">
-          Save
-        </button>
-      </mat-card-actions>
-    </mat-card>
+   <app-notifier-settings *ngIf="selectedNotifier" [notifier]="selectedNotifier"></app-notifier-settings>
   </div>
 </div>

@@ -40,6 +40,7 @@ import {TokenInterceptor} from './http_interceptor/token.interceptor';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { NotifierSettingsComponent } from './components/notifier-settings/notifier-settings.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     ServiceDetailsComponent,
     SettingsComponent,
     SetupComponent,
-    LoginComponent
+    LoginComponent,
+    NotifierSettingsComponent
   ],
   imports: [
     BrowserModule,
