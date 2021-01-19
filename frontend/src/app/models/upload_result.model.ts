@@ -1,6 +1,6 @@
 import {Service} from './service.model';
 
-export interface UploadResult {
+export interface ImportResult {
   rowNumber: number;
   service: Service;
   error: string;

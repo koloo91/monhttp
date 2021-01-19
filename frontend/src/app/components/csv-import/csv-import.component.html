@@ -1,0 +1,18 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>CSV Import</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    <button type="button" mat-raised-button (click)="fileInput.click()" [disabled]="isLoading">Choose File</button>
+    <input hidden (change)="handleFileInput($event)" #fileInput type="file" id="file" accept=".csv">
+    <div *ngIf="fileToUpload">
+      {{fileToUpload.name}}
+    </div>
+  </mat-card-content>
+  <mat-card-actions align="right">
+    <button mat-raised-button color="accent" (click)="uploadFile()" [disabled]="!fileToUpload || isLoading">
+      Upload
+    </button>
+  </mat-card-actions>
+</mat-card>

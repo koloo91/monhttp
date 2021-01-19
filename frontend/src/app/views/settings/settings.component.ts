@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {Notifier} from '../../models/notifier.model';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {tap} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -25,17 +26,14 @@ export class SettingsComponent implements OnInit {
 
   loadNotifiers(): void {
     this.selectedNotifier = null;
-    this.notifiers$ = this.notifierService.list()
-      .pipe(
-        tap((notifiers) => {
-          if (!this.selectedNotifier) {
-            this.selectedNotifier = notifiers[0];
-          }
-        })
-      );
+    this.notifiers$ = this.notifierService.list();
   }
 
   notifierSelected(notifier: Notifier): void {
     this.selectedNotifier = notifier;
+  }
+
+  resetSelectedNotifier(): void {
+    this.selectedNotifier = null;
   }
 }

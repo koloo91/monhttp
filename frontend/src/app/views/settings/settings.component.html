@@ -1,19 +1,19 @@
 <div id="settings-view">
-  <div class="notifiers-list">
+  <div class="settings-list">
     <mat-selection-list [multiple]="false">
       <div mat-subheader>General</div>
-      <mat-list-option class="notifier-entry" *ngFor="let notifier of (notifiers$ | async)"
-                     (click)="notifierSelected(notifier)">
-        {{notifier.name}}
+      <mat-list-option class="settings-entry" routerLink="/settings/import" (click)="resetSelectedNotifier()">
+        Import
       </mat-list-option>
       <div mat-subheader>Notifiers</div>
-      <mat-list-option class="notifier-entry" *ngFor="let notifier of (notifiers$ | async)"
-                     (click)="notifierSelected(notifier)">
+      <mat-list-option class="settings-entry" *ngFor="let notifier of (notifiers$ | async)"
+                       (click)="notifierSelected(notifier)">
         {{notifier.name}}
       </mat-list-option>
     </mat-selection-list>
   </div>
-  <div class="notifiers-form">
+  <div class="settings-form">
+    <router-outlet *ngIf="!selectedNotifier"></router-outlet>
    <app-notifier-settings *ngIf="selectedNotifier" [notifier]="selectedNotifier"></app-notifier-settings>
   </div>
 </div>
