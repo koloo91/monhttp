@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ImportService} from '../../services/import.service';
-import {tap} from 'rxjs/operators';
+import {finalize} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
 import {ImportResult} from '../../models/upload_result.model';
 import {ImportResultDialogComponent} from '../dialogs/import-result-dialog/import-result-dialog.component';
@@ -33,7 +33,7 @@ export class CsvImportComponent implements OnInit {
     formData.append('file', this.fileToUpload);
     this.importService.importCsv(formData)
       .pipe(
-        tap(() => this.isLoading = false)
+        finalize(() => this.isLoading = false)
       )
       .subscribe((wrapper) => {
         this.showImportResult(wrapper.data);

@@ -23,7 +23,12 @@ func importCsv(ctx *gin.Context) {
 		return
 	}
 
-	results := service.ImportCsvData(ctx.Request.Context(), fileHeader)
+	results, err := service.ImportCsvData(ctx.Request.Context(), fileHeader)
+	if err != nil {
+		log.Errorf("Unable to import data: '%s'", err)
+		ctx.JSON(http.StatusInternalServerError, toApiError(err))
+		return
+	}
 	resultVos := model.MapImportResultEntitiesToVos(results)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": resultVos})

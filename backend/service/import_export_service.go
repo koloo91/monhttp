@@ -36,11 +36,14 @@ const (
 	notifiersIndex
 )
 
-func ImportCsvData(ctx context.Context, file io.Reader) []model.ImportResult {
+func ImportCsvData(ctx context.Context, file io.Reader) ([]model.ImportResult, error) {
 	csvReader := csv.NewReader(file)
 
 	// read header line
-	_, _ = csvReader.Read()
+	_, err := csvReader.Read()
+	if err != nil {
+		return nil, err
+	}
 
 	result := make([]model.ImportResult, 0)
 	rowNumber := 0
@@ -52,6 +55,11 @@ func ImportCsvData(ctx context.Context, file io.Reader) []model.ImportResult {
 		if err == io.EOF {
 			break
 		}
+
+		if errors.Is(err, csv.ErrBareQuote) {
+			return nil, err
+		}
+
 		if err != nil {
 			result = append(result, model.ImportResult{RowNumber: rowNumber, Error: err})
 			continue
@@ -71,7 +79,7 @@ func ImportCsvData(ctx context.Context, file io.Reader) []model.ImportResult {
 		entry.Error = err
 	}
 
-	return result
+	return result, nil
 }
 
 func csvRowToService(row []string) (model.Service, error) {
