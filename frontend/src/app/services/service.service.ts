@@ -17,11 +17,8 @@ export class ServiceService {
     return this.http.post<Service>('/api/services', service);
   }
 
-  list(): Observable<Service[]> {
-    return this.http.get<Wrapper<Service>>('/api/services')
-      .pipe(
-        map(wrapper => wrapper.data)
-      )
+  list(pageSize: number, page: number): Observable<Wrapper<Service>> {
+    return this.http.get<Wrapper<Service>>('/api/services', {params: {pageSize: `${pageSize}`, page: `${page}`}});
   }
 
   get(id: string): Observable<Service> {

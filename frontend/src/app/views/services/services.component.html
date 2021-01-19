@@ -52,4 +52,10 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+
+  <mat-paginator [pageSizeOptions]="servicesPerPage"
+                 [pageSize]="servicesPageSize"
+                 [length]="servicesTotalCount"
+                 (page)="onServicePageChanged($event)"
+                 showFirstLastButtons></mat-paginator>
 </div>

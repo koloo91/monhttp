@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {Notifier} from '../../models/notifier.model';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {tap} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -15,10 +16,7 @@ export class SettingsComponent implements OnInit {
   notifiers$: Observable<Notifier[]>;
   selectedNotifier: Notifier;
 
-  notifierFormGroup: FormGroup = this.fb.group({});
-
-  constructor(private notifierService: NotifierService,
-              private fb: FormBuilder) {
+  constructor(private notifierService: NotifierService) {
 
   }
 
@@ -28,43 +26,14 @@ export class SettingsComponent implements OnInit {
 
   loadNotifiers(): void {
     this.selectedNotifier = null;
-    this.notifierFormGroup = null;
-    this.notifiers$ = this.notifierService.list()
-      .pipe(
-        tap(notifiers => this.notifierSelected(notifiers[0]))
-      );
+    this.notifiers$ = this.notifierService.list();
   }
 
-  notifierSelected(notifier: Notifier) {
-    this.notifierFormGroup = this.fb.group({});
-    notifier.form.forEach(form => {
-      this.notifierFormGroup.addControl(form.formControlName, this.fb.control(notifier.data[form.formControlName]));
-    });
-
+  notifierSelected(notifier: Notifier): void {
     this.selectedNotifier = notifier;
   }
 
-  updateNotifier(): void {
-    this.notifierService.put(this.selectedNotifier.id, this.notifierFormGroup.value)
-      .subscribe(
-        () => this.loadNotifiers(),
-        console.log
-      );
-  }
-
-  testUpTemplate(): void {
-    this.notifierService.testUpTemplate(this.selectedNotifier.id, this.notifierFormGroup.value)
-      .subscribe(
-        console.log,
-        console.log
-      );
-  }
-
-  testDownTemplate(): void {
-    this.notifierService.testDownTemplate(this.selectedNotifier.id, this.notifierFormGroup.value)
-      .subscribe(
-        console.log,
-        console.log
-      );
+  resetSelectedNotifier(): void {
+    this.selectedNotifier = null;
   }
 }

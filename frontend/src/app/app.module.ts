@@ -38,8 +38,10 @@ import {SetupComponent} from './views/setup/setup.component';
 import {LoginComponent} from './views/login/login.component';
 import {TokenInterceptor} from './http_interceptor/token.interceptor';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {NotifierSettingsComponent} from './components/notifier-settings/notifier-settings.component';
+import {CsvImportComponent} from './components/csv-import/csv-import.component';
+import {ImportResultDialogComponent} from './components/dialogs/import-result-dialog/import-result-dialog.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +56,10 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     ServiceDetailsComponent,
     SettingsComponent,
     SetupComponent,
-    LoginComponent
+    LoginComponent,
+    NotifierSettingsComponent,
+    CsvImportComponent,
+    ImportResultDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -82,7 +87,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     MatDatepickerModule,
     NgxMatNativeDateModule,
     MatPaginatorModule,
-    MatProgressBarModule
+    MatProgressBarModule,
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},

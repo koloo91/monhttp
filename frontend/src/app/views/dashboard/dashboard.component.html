@@ -1,13 +1,23 @@
 <div id="dashboard-component">
   <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
-  <div class="cards-container" *ngIf="services$ |async as services">
-    <app-service-card *ngFor="let service of services"
-                      [service]="service"
-                      (cardClicked)="showServiceDetails($event)"
-                      class="service-card">
-    </app-service-card>
-    <div *ngIf="services.length === 0">
-      Looks like you haven't created any services yet. <a href="/services/create">Click here to create a new service.</a>
+  <div *ngIf="wrapper$ |async as wrapper">
+    <div class="cards-container">
+      <app-service-card *ngFor="let service of wrapper.data"
+                        [service]="service"
+                        (cardClicked)="showServiceDetails($event)"
+                        class="service-card">
+      </app-service-card>
+      <div *ngIf="wrapper.data.length === 0">
+        Looks like you haven't created any services yet. <a href="/services/create">Click here to create a new
+        service.</a>
+      </div>
     </div>
+
+    <mat-paginator *ngIf="wrapper.data.length !== 0"
+                   [pageSizeOptions]="servicesPerPage"
+                   [pageSize]="servicesPageSize"
+                   [length]="wrapper.totalCount"
+                   (page)="onServicePageChanged($event)"
+                   showFirstLastButtons></mat-paginator>
   </div>
 </div>

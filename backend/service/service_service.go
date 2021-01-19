@@ -33,8 +33,12 @@ func CreateService(ctx context.Context, service model.Service) (model.Service, e
 	return service, nil
 }
 
-func GetServices(ctx context.Context) ([]model.Service, error) {
-	return repository.SelectServices(ctx)
+func GetServices(ctx context.Context, pageSize, page int) ([]model.Service, error) {
+	return repository.SelectServices(ctx, pageSize, pageSize*page)
+}
+
+func GetServicesCount(ctx context.Context) (int, error) {
+	return repository.SelectServicesCount(ctx)
 }
 
 func GetServiceById(ctx context.Context, id string) (model.Service, error) {

@@ -1,7 +1,10 @@
 package model
 
 type ServiceWrapperVo struct {
-	Data []ServiceVo `json:"data"`
+	Data       []ServiceVo `json:"data"`
+	TotalCount int         `json:"totalCount"`
+	PageSize   int         `json:"pageSize"`
+	Page       int         `json:"page"`
 }
 
 type CheckWrapperVo struct {

@@ -11,6 +11,7 @@ import {SetupComponent} from './views/setup/setup.component';
 import {LoginComponent} from './views/login/login.component';
 import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 import {IsSetupGuard} from './guards/is-setup.guard';
+import {CsvImportComponent} from './components/csv-import/csv-import.component';
 
 const routes: Routes = [
   {
@@ -39,7 +40,11 @@ const routes: Routes = [
       },
       {
         path: 'settings',
-        component: SettingsComponent
+        component: SettingsComponent,
+        children: [
+          {path: 'import', component: CsvImportComponent},
+          {path: '**', pathMatch: 'full', redirectTo: 'import'}
+        ]
       }
     ]
   },

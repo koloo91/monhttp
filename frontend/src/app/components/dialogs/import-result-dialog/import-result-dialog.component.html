@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Import result</h1>
+<div mat-dialog-content>
+  <mat-list role="list">
+    <mat-list-item role="listitem" *ngFor="let result of data">
+      <b># {{result.rowNumber+1}} </b>
+      <div *ngIf="result.error">
+        {{result.error}}
+      </div>
+      <div *ngIf="!result.error">
+        {{result.service.name}} imported!
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()" cdkFocusInitial>OK</button>
+</div>
