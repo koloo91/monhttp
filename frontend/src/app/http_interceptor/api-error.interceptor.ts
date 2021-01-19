@@ -35,7 +35,7 @@ export class ApiErrorInterceptor implements HttpInterceptor {
       const apiError: ApiError = {message: error.error.message};
       return throwError(apiError);
     } else {
-      const apiError = error.error as ApiError;
+      const apiError: ApiError = {message: error.statusText};
       return throwError(apiError);
     }
   }

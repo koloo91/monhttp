@@ -3,7 +3,7 @@ import {ServiceService} from '../../services/service.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Service} from '../../models/service.model';
 import {Router} from '@angular/router';
-import {switchMap, tap} from 'rxjs/operators';
+import {delay, switchMap, tap} from 'rxjs/operators';
 import {PageEvent} from '@angular/material/paginator';
 import {Wrapper} from '../../models/wrapper.model';
 
@@ -35,6 +35,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.wrapper$ = this.servicesPaginatorEvent$
       .pipe(
+        delay(0),
         tap(() => this.isLoading = true),
         switchMap(pageEvent => this.serviceService.list(pageEvent.pageSize, pageEvent.pageIndex)),
         tap(() => this.isLoading = false)

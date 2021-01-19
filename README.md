@@ -68,3 +68,7 @@ configuration.
 |  USERS |   | A list in the format "name:password" you can add here as many users as you want to  |
 
 You can also use environment variables to configure `monhttp`. Environment variables override the values from the `config.env` file.
+
+## Import
+
+A sample file for CSV import can be found in the folder ["/examples/csv"](https://github.com/koloo91/monhttp/tree/main/examples/csv).
