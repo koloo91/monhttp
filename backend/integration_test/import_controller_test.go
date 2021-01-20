@@ -3,6 +3,7 @@ package integration_test
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/koloo91/monhttp/service"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"mime/multipart"
@@ -12,8 +13,8 @@ import (
 	"testing"
 )
 
-func createMultipartFormBody(t *testing.T) (*bytes.Buffer, *multipart.Writer) {
-	csvFile, err := os.Open("files/services.csv")
+func createMultipartFormBodyFromFile(fileName string, t *testing.T) (*bytes.Buffer, *multipart.Writer) {
+	csvFile, err := os.Open(fileName)
 	assert.Nil(t, err)
 
 	fileContents, err := ioutil.ReadAll(csvFile)
@@ -37,7 +38,7 @@ func createMultipartFormBody(t *testing.T) (*bytes.Buffer, *multipart.Writer) {
 func (suite *MonHttpTestSuite) TestImportShouldReturnNotSetupIfNotSetup() {
 	suite.resetSettings()
 
-	requestBody, multipartWriter := createMultipartFormBody(suite.T())
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_one_ok.csv", suite.T())
 
 	recorder := httptest.NewRecorder()
 	request, _ := http.NewRequest("POST", "/api/import", requestBody)
@@ -53,7 +54,7 @@ func (suite *MonHttpTestSuite) TestImportShouldReturnNotSetupIfNotSetup() {
 }
 
 func (suite *MonHttpTestSuite) TestImportShouldReturnUnauthorizedWithoutCredentials() {
-	requestBody, multipartWriter := createMultipartFormBody(suite.T())
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_one_ok.csv", suite.T())
 
 	recorder := httptest.NewRecorder()
 	request, _ := http.NewRequest("POST", "/api/import", requestBody)
@@ -69,7 +70,7 @@ func (suite *MonHttpTestSuite) TestImportShouldReturnUnauthorizedWithoutCredenti
 }
 
 func (suite *MonHttpTestSuite) TestImportShouldReturnOk() {
-	requestBody, multipartWriter := createMultipartFormBody(suite.T())
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_one_ok.csv", suite.T())
 
 	recorder := httptest.NewRecorder()
 	request, _ := http.NewRequest("POST", "/api/import", requestBody)
@@ -109,4 +110,96 @@ func (suite *MonHttpTestSuite) TestImportShouldReturnOk() {
 	assert.Equal(suite.T(), float64(2), service["notifyAfterNumberOfFailures"])
 	assert.Equal(suite.T(), false, service["continuouslySendNotifications"])
 	assert.Equal(suite.T(), []interface{}{"global", "telegram"}, service["notifiers"])
+}
+
+func (suite *MonHttpTestSuite) TestImportShouldReturnInvalidServiceType() {
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_invalid_service_type.csv", suite.T())
+
+	recorder := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/api/import", requestBody)
+	request.SetBasicAuth(user, password)
+	request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+
+	suite.router.ServeHTTP(recorder, request)
+
+	var responseBody map[string]interface{}
+	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+
+	data := responseBody["data"].([]interface{})
+	assert.Equal(suite.T(), 1, len(data))
+
+	firsEntry := data[0].(map[string]interface{})
+	assert.Equal(suite.T(), 1.0, firsEntry["rowNumber"])
+	assert.Equal(suite.T(), service.ErrInvalidServiceType.Error(), firsEntry["error"])
+}
+
+func (suite *MonHttpTestSuite) TestImportShouldReturnInvalidHttpMethod() {
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_invalid_http_method.csv", suite.T())
+
+	recorder := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/api/import", requestBody)
+	request.SetBasicAuth(user, password)
+	request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+
+	suite.router.ServeHTTP(recorder, request)
+
+	var responseBody map[string]interface{}
+	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+
+	data := responseBody["data"].([]interface{})
+	assert.Equal(suite.T(), 1, len(data))
+
+	firsEntry := data[0].(map[string]interface{})
+	assert.Equal(suite.T(), 1.0, firsEntry["rowNumber"])
+	assert.Equal(suite.T(), service.ErrInvalidHttpMethod.Error(), firsEntry["error"])
+}
+
+func (suite *MonHttpTestSuite) TestImportShouldReturnInvalidCheckIntervalInSeconds() {
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_invalid_check_interval_in_seconds.csv", suite.T())
+
+	recorder := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/api/import", requestBody)
+	request.SetBasicAuth(user, password)
+	request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+
+	suite.router.ServeHTTP(recorder, request)
+
+	var responseBody map[string]interface{}
+	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+
+	data := responseBody["data"].([]interface{})
+	assert.Equal(suite.T(), 1, len(data))
+
+	firsEntry := data[0].(map[string]interface{})
+	assert.Equal(suite.T(), 1.0, firsEntry["rowNumber"])
+	assert.Equal(suite.T(), service.ErrInvalidIntervalInSeconds.Error(), firsEntry["error"])
+}
+
+func (suite *MonHttpTestSuite) TestImportShouldReturnInvalidRequestTimeoutInSeconds() {
+	requestBody, multipartWriter := createMultipartFormBodyFromFile("files/csv/services_invalid_request_timeout_in_seconds.csv", suite.T())
+
+	recorder := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/api/import", requestBody)
+	request.SetBasicAuth(user, password)
+	request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+
+	suite.router.ServeHTTP(recorder, request)
+
+	var responseBody map[string]interface{}
+	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+
+	data := responseBody["data"].([]interface{})
+	assert.Equal(suite.T(), 1, len(data))
+
+	firsEntry := data[0].(map[string]interface{})
+	assert.Equal(suite.T(), 1.0, firsEntry["rowNumber"])
+	assert.Equal(suite.T(), service.ErrInvalidRequestTimeoutInSeconds.Error(), firsEntry["error"])
 }
