@@ -55,20 +55,24 @@ configuration.
 
 | Key  | Value  | Description  |
 |---|---|---|
-|  DATABASE_HOST | localhost  |   |
-|  DATABASE_NAME |  monhttp |   |
-|  DATABASE_PASSWORD |  top_secret |   |
-|  DATABASE_PORT | 5432  |   |
-|  DATABASE_USER | monhttp_user  |   |
+| DATABASE_HOST | localhost  |   |
+| DATABASE_NAME |  monhttp |   |
+| DATABASE_PASSWORD |  top_secret |   |
+| DATABASE_PORT | 5432  |   |
+| DATABASE_USER | monhttp_user  |   |
 |   |   |   |
-|  NOTIFIER |   |   |
+| NOTIFIER |   |   |
 |   |   |   |
-|  SERVER_PORT | 8081  |   |
+| SERVER_PORT | 8081  |   |
 |   |   |   |
-|  USERS |   | A list in the format "name:password" you can add here as many users as you want to  |
+| USERS | admin:admin,admin1:admin  | A list in the format "name:password" you can add here as many users as you want to  |
+|   |   |   |
+| SCHEDULER_ENABLED  | true  | If false, then no data is collected  |
+| SCHEDULER_NUMBER_OF_WORKERS  | 5  | How many "workers" should process the services asynchronously. If there are many services, the value should be increased.  |
+
 
 You can also use environment variables to configure `monhttp`. Environment variables override the values from the `config.env` file.
 
 ## Import
 
-A sample file for CSV import can be found in the folder ["/examples/csv"](https://github.com/koloo91/monhttp/tree/main/examples/csv).
+A sample file for CSV import can be found in the folder ["/examples/csv"](https://github.com/koloo91/monhttp/tree/main/examples/csv). More information is available in the wiki.
