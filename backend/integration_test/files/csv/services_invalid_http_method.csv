@@ -1,0 +1,2 @@
+Name        ,Type,IntervalInSeconds,Endpoint         ,HttpMethod,RequestTimeoutInSeconds,HttpHeaders,HttpBody,ExpectedResponseBody,ExpectedStatusCode,FollowRedirects,VerifySsl,EnableNotifications,NotifyAfterNumberOfFailures,ContinuouslySendNotifications,Notifiers
+Test Service,HTTP,30               ,http://google.com,Foo       ,60                     ,           ,        ,                    ,200               ,true           ,true     ,true               ,2                          ,false                        ,"global,telegram"

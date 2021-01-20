@@ -129,3 +129,37 @@ func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnErrorIfWrongType(
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), "Key: 'ServiceVo.Type' Error:Field validation for 'Type' failed on the 'oneof' tag", responseBody["message"])
 }
+
+func (suite *MonHttpTestSuite) TestCreateNewServiceShouldReturnErrorIfInvalidIntervalInSeconds() {
+	requestBody, err := json.Marshal(map[string]interface{}{
+		"name":                          "MyService",
+		"type":                          "HTTP",
+		"intervalInSeconds":             29,
+		"endpoint":                      "http://localhost",
+		"httpMethod":                    "GET",
+		"requestTimeoutInSeconds":       60,
+		"httpHeaders":                   "httpHeaders",
+		"httpBody":                      "httpBody",
+		"expectedHttpResponseBody":      "expectedHttpResponseBody",
+		"expectedHttpStatusCode":        200,
+		"followRedirects":               true,
+		"verifySsl":                     true,
+		"enableNotifications":           true,
+		"notifyAfterNumberOfFailures":   2,
+		"continuouslySendNotifications": true,
+		"notifiers":                     []string{},
+	})
+	assert.Nil(suite.T(), err)
+
+	recorder := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/api/services", bytes.NewBuffer(requestBody))
+	request.SetBasicAuth(user, password)
+
+	suite.router.ServeHTTP(recorder, request)
+
+	var responseBody map[string]interface{}
+	assert.Nil(suite.T(), json.Unmarshal(recorder.Body.Bytes(), &responseBody))
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), "Key: 'ServiceVo.IntervalInSeconds' Error:Field validation for 'IntervalInSeconds' failed on the 'min' tag", responseBody["message"])
+}

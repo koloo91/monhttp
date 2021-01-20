@@ -13,8 +13,10 @@ import (
 )
 
 var (
-	ErrInvalidServiceType = errors.New("invalid service type. must be one of [HTTP, ICMP_PING]")
-	ErrHttpMethod         = errors.New("invalid http method. must be one of [GET, POST, PUT, PATCH, DELETE]")
+	ErrInvalidServiceType             = errors.New("invalid service type. must be one of [HTTP, ICMP_PING]")
+	ErrInvalidHttpMethod              = errors.New("invalid http method. must be one of [GET, POST, PUT, PATCH, DELETE]")
+	ErrInvalidIntervalInSeconds       = errors.New("interval in seconds must be between 30 and 1800")
+	ErrInvalidRequestTimeoutInSeconds = errors.New("request timout in seconds must be between 1 and 180")
 )
 
 const (
@@ -98,19 +100,25 @@ func csvRowToService(row []string) (model.Service, error) {
 	intervalInSeconds := strings.TrimSpace(row[intervalInSecondsIndex])
 	intervalInSecondsInt, err := strconv.Atoi(intervalInSeconds)
 	if err != nil {
-		return model.Service{}, err
+		return model.Service{}, ErrInvalidIntervalInSeconds
+	}
+	if intervalInSecondsInt < 30 || intervalInSecondsInt > 1800 {
+		return model.Service{}, ErrInvalidIntervalInSeconds
 	}
 
 	endpoint := strings.TrimSpace(row[endpointIndex])
 	httpMethod := strings.TrimSpace(row[httpMethodIndex])
 	if httpMethod != "GET" && httpMethod != "POST" && httpMethod != "PUT" && httpMethod != "PATCH" && httpMethod != "DELETE" {
-		return model.Service{}, ErrHttpMethod
+		return model.Service{}, ErrInvalidHttpMethod
 	}
 
 	requestTimeoutInSeconds := strings.TrimSpace(row[requestTimeoutInSecondsIndex])
 	requestTimeoutInSecondsInt, err := strconv.Atoi(requestTimeoutInSeconds)
 	if err != nil {
-		return model.Service{}, err
+		return model.Service{}, ErrInvalidRequestTimeoutInSeconds
+	}
+	if requestTimeoutInSecondsInt < 1 || requestTimeoutInSecondsInt > 180 {
+		return model.Service{}, ErrInvalidRequestTimeoutInSeconds
 	}
 
 	httpHeaders := strings.TrimSpace(row[httpHeadersIndex])
