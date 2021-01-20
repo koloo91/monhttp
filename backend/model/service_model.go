@@ -38,10 +38,10 @@ type ServiceVo struct {
 	Id                            string      `json:"id"`
 	Name                          string      `json:"name" binding:"required"`
 	Type                          ServiceType `json:"type" binding:"required,oneof=HTTP ICMP_PING"`
-	IntervalInSeconds             int         `json:"intervalInSeconds" binding:"required"`
+	IntervalInSeconds             int         `json:"intervalInSeconds" binding:"required,min=30,max=1800"`
 	Endpoint                      string      `json:"endpoint" binding:"required"`
 	HttpMethod                    string      `json:"httpMethod"`
-	RequestTimeoutInSeconds       int         `json:"requestTimeoutInSeconds"`
+	RequestTimeoutInSeconds       int         `json:"requestTimeoutInSeconds" binding:"min=1,max=180"`
 	HttpHeaders                   string      `json:"httpHeaders"`
 	HttpBody                      string      `json:"httpBody"`
 	ExpectedHttpResponseBody      string      `json:"expectedHttpResponseBody"`
