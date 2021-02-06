@@ -18,6 +18,7 @@ const (
 								WHERE id = $1 
 								FOR UPDATE;`
 	updateJobByIdExecuteAtQuery = `UPDATE job SET execute_at = $2 WHERE id = $1;`
+	getJobByServiceId           = `SELECT id, execute_at, created_at, updated_at FROM job WHERE service_id = $1;`
 )
 
 func InsertJobTx(ctx context.Context, tx *sql.Tx, job model.Job) error {
@@ -72,4 +73,23 @@ func UpdateJobByIdExecuteAtTx(ctx context.Context, tx *sql.Tx, id string, execut
 		return err
 	}
 	return nil
+}
+
+func GetJobByServiceId(ctx context.Context, serviceId string) (model.Job, error) {
+	row := db.QueryRowContext(ctx, getJobByServiceId, serviceId)
+
+	var id string
+	var executeAt, createdAt, updatedAt time.Time
+
+	if err := row.Scan(&id, &executeAt, &createdAt, &updatedAt); err != nil {
+		return model.Job{}, err
+	}
+
+	return model.Job{
+		Id:        id,
+		ServiceId: serviceId,
+		ExecuteAt: executeAt,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}, nil
 }
