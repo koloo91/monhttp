@@ -59,6 +59,7 @@ func (suite *MonHttpTestSuite) SetupSuite() {
 func (suite *MonHttpTestSuite) SetupTest() {
 	log.Println("Setup test")
 	suite.setupSettings()
+	suite.cleanupDatabase()
 }
 
 func (suite *MonHttpTestSuite) TearDownTest() {
@@ -135,4 +136,11 @@ func (suite *MonHttpTestSuite) resetSettings() {
 
 func (suite *MonHttpTestSuite) loadTestConfig() {
 	assert.Nil(suite.T(), service.LoadConfig())
+}
+
+func (suite *MonHttpTestSuite) cleanupDatabase() {
+	_, err := service.GetDatabase().Exec("DELETE FROM service;")
+	if err != nil {
+		suite.T().Fail()
+	}
 }

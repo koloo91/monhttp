@@ -10,9 +10,9 @@ import (
 )
 
 type GetChecksQueryParameter struct {
-	From           *time.Time `form:"from" binding:"required"`
-	To             *time.Time `form:"to" binding:"required"`
-	ReduceByFactor *int       `form:"reduceByFactor" binding:"required"`
+	From           *time.Time `form:"from"`
+	To             *time.Time `form:"to"`
+	ReduceByFactor *int       `form:"reduceByFactor"`
 }
 
 func getChecks(ctx *gin.Context) {
@@ -23,6 +23,21 @@ func getChecks(ctx *gin.Context) {
 		log.Errorf("Unable to get query parameter: '%s'", err)
 		ctx.JSON(http.StatusBadRequest, toApiError(err))
 		return
+	}
+
+	if queryParameter.From == nil {
+		from := time.Now().Add(-24 * time.Hour)
+		queryParameter.From = &from
+	}
+
+	if queryParameter.To == nil {
+		to := time.Now()
+		queryParameter.To = &to
+	}
+
+	if queryParameter.ReduceByFactor == nil {
+		reduceByFactor := 1
+		queryParameter.ReduceByFactor = &reduceByFactor
 	}
 
 	checks, err := service.GetChecks(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To, *queryParameter.ReduceByFactor)

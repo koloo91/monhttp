@@ -11,10 +11,10 @@ import (
 )
 
 type GetFailuresQueryParameter struct {
-	PageSize *int       `form:"pageSize" binding:"required"`
-	Page     *int       `form:"page" binding:"required"`
-	From     *time.Time `form:"from" binding:"required"`
-	To       *time.Time `form:"to" binding:"required"`
+	PageSize *int       `form:"pageSize"`
+	Page     *int       `form:"page"`
+	From     *time.Time `form:"from"`
+	To       *time.Time `form:"to"`
 }
 
 type GetFailuresGroupedByDayQueryParameter struct {
@@ -30,6 +30,26 @@ func getFailures(ctx *gin.Context) {
 		log.Errorf("Unable to get query parameter: '%s'", err)
 		ctx.JSON(http.StatusBadRequest, toApiError(err))
 		return
+	}
+
+	if queryParameter.From == nil {
+		from := time.Now().Add(-24 * time.Hour)
+		queryParameter.From = &from
+	}
+
+	if queryParameter.To == nil {
+		to := time.Now()
+		queryParameter.To = &to
+	}
+
+	if queryParameter.Page == nil {
+		page := 0
+		queryParameter.Page = &page
+	}
+
+	if queryParameter.PageSize == nil {
+		pageSize := 50
+		queryParameter.PageSize = &pageSize
 	}
 
 	failures, err := service.GetFailures(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To, *queryParameter.PageSize, *queryParameter.Page)
