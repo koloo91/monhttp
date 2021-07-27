@@ -57,10 +57,19 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Time interval</mat-label>
-            <mat-select (selectionChange)="onSelectionChange($event)" formControlName="timeInterval">
-              <mat-option *ngFor="let timeInterval of timeIntervals" [value]="timeInterval.name">
-                {{timeInterval.name}}
+            <mat-label>Date time range</mat-label>
+            <mat-select (selectionChange)="onDateTimeRangeSelectionChange($event)" formControlName="dateTimeRange">
+              <mat-option *ngFor="let dateTimeRange of datetimeRanges" [value]="dateTimeRange.name">
+                {{dateTimeRange.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Interval</mat-label>
+            <mat-select formControlName="interval">
+              <mat-option *ngFor="let interval of groupByIntervals" [value]="interval.value">
+                {{interval.name}}
               </mat-option>
             </mat-select>
           </mat-form-field>

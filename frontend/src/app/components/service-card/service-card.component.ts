@@ -3,7 +3,7 @@ import {Service} from '../../models/service.model';
 import {CheckService} from '../../services/check.service';
 import {Observable} from 'rxjs';
 import {Average} from '../../models/average.model';
-import {map, tap} from 'rxjs/operators';
+import { finalize, map, tap } from 'rxjs/operators';
 import {Check} from '../../models/check.model';
 import {IsOnline} from '../../models/is-online.model';
 
@@ -58,10 +58,10 @@ export class ServiceCardComponent implements OnInit {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString(), 6)
+    this.checkService.list(this.service.id, yesterday.toISOString(), new Date().toISOString(), 300)
       .pipe(
         map(checks => checks.reverse()),
-        tap(() => this.isLoading = false)
+        finalize(() => this.isLoading = false)
       )
       .subscribe(checks => {
         this.checks = checks;

@@ -9,11 +9,14 @@ import (
 	"time"
 )
 
-func GetChecks(ctx context.Context, serviceId string, from, to time.Time, reduceByFactor int) ([]model.Check, error) {
-	if reduceByFactor <= 0 {
-		reduceByFactor = 1
+func GetChecks(ctx context.Context, serviceId string, from, to time.Time, interval int) ([]model.Check, error) {
+	if interval <= 0 {
+		// minutes * 60 get interval as seconds. default is 5 minutes
+		interval = 300
 	}
-	return repository.SelectChecks(ctx, serviceId, from, to, reduceByFactor)
+	// TODO: get default intervals
+
+	return repository.SelectChecks(ctx, serviceId, from, to, interval)
 }
 
 func GetAverageValues(ctx context.Context, serviceId string) (model.Average, error) {

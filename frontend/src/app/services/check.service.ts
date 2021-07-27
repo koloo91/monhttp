@@ -15,12 +15,12 @@ export class CheckService {
   constructor(private http: HttpClient) {
   }
 
-  list(serviceId: string, from: string, to: string, reduceByFactor: number): Observable<Check[]> {
+  list(serviceId: string, from: string, to: string, interval: number): Observable<Check[]> {
     return this.http.get<Wrapper<Check>>(`/api/services/${serviceId}/checks`, {
       params: {
         from,
         to,
-        reduceByFactor: `${reduceByFactor}`
+        interval: `${interval}`
       }
     })
       .pipe(

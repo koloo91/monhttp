@@ -18,15 +18,16 @@ var (
 func prepareCheckStatements() {
 	var err error
 
-	selectChecksByServiceIdAndCreatedAtStatement, err = db.Prepare(`SELECT id, latency_in_ms, is_failure, created_at
-																			FROM (
-																					 SELECT *, row_number() over (ORDER BY created_at DESC) AS row
-																					 FROM "check"
-																					 WHERE service_id = $1
-																					   AND created_at >= $2
-																					   AND created_at <= $3
-																					 ORDER BY created_at DESC) as checks
-																			WHERE row % $4 = 0;`)
+	selectChecksByServiceIdAndCreatedAtStatement, err = db.Prepare(`SELECT AVG(latency_in_ms)::numeric(5,0) AS latency_in_ms,
+																				   BOOL_AND(is_failure) AS is_failure,
+																				   MAX(created_at) AS created_at,
+																				   FLOOR((EXTRACT(epoch from created_at)) /$4) as check_interval
+																			FROM "check"
+																			WHERE service_id = $1
+																			  AND created_at >= $2
+																			  AND created_at <= $3
+																			GROUP BY check_interval
+																			ORDER BY created_at DESC;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,27 +76,26 @@ func InsertCheck(ctx context.Context, tx *sql.Tx, check model.Check) error {
 	return nil
 }
 
-func SelectChecks(ctx context.Context, serviceId string, from, to time.Time, reduceByFactor int) ([]model.Check, error) {
-	rows, err := selectChecksByServiceIdAndCreatedAtStatement.QueryContext(ctx, serviceId, from, to, reduceByFactor)
+func SelectChecks(ctx context.Context, serviceId string, from, to time.Time, interval int) ([]model.Check, error) {
+	rows, err := selectChecksByServiceIdAndCreatedAtStatement.QueryContext(ctx, serviceId, from, to, interval)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var id string
 	var latencyInMs int64
 	var isFailure bool
 	var createdAt time.Time
+	var epoche float64
 
 	result := make([]model.Check, 0)
 
 	for rows.Next() {
-		if err := rows.Scan(&id, &latencyInMs, &isFailure, &createdAt); err != nil {
+		if err := rows.Scan(&latencyInMs, &isFailure, &createdAt, &epoche); err != nil {
 			return nil, err
 		}
 
 		result = append(result, model.Check{
-			Id:          id,
 			ServiceId:   serviceId,
 			LatencyInMs: latencyInMs,
 			IsFailure:   isFailure,

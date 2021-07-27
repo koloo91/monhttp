@@ -10,9 +10,9 @@ import (
 )
 
 type GetChecksQueryParameter struct {
-	From           *time.Time `form:"from"`
-	To             *time.Time `form:"to"`
-	ReduceByFactor *int       `form:"reduceByFactor"`
+	From     *time.Time `form:"from"`
+	To       *time.Time `form:"to"`
+	Interval *int       `form:"interval"`
 }
 
 func getChecks(ctx *gin.Context) {
@@ -35,12 +35,12 @@ func getChecks(ctx *gin.Context) {
 		queryParameter.To = &to
 	}
 
-	if queryParameter.ReduceByFactor == nil {
-		reduceByFactor := 1
-		queryParameter.ReduceByFactor = &reduceByFactor
+	if queryParameter.Interval == nil {
+		interval := 300
+		queryParameter.Interval = &interval
 	}
 
-	checks, err := service.GetChecks(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To, *queryParameter.ReduceByFactor)
+	checks, err := service.GetChecks(ctx.Request.Context(), serviceId, *queryParameter.From, *queryParameter.To, *queryParameter.Interval)
 	if err != nil {
 		log.Errorf("Unable to get checks from database: '%s'", err)
 		ctx.JSON(http.StatusInternalServerError, toApiError(err))

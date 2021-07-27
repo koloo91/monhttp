@@ -27,7 +27,8 @@ export class ServiceDetailsComponent implements OnInit {
   dateTimeRangeFormGroup = new FormGroup({
     fromDateTime: new FormControl(new Date()),
     toDateTime: new FormControl(new Date()),
-    timeInterval: new FormControl('')
+    dateTimeRange: new FormControl('1 day'),
+    interval: new FormControl(300)
   });
 
   service$: Observable<Service>;
@@ -44,58 +45,89 @@ export class ServiceDetailsComponent implements OnInit {
 
   failuresCountByDayChartData: any;
 
-  timeIntervals = [
+  datetimeRanges = [
     {
       name: '1 minute',
-      get: () => this.setTimeInterval(0, 0, 1)
+      get: () => this.setDateTimeRange(0, 0, 1)
     },
     {
       name: '5 minutes',
-      get: () => this.setTimeInterval(0, 0, 5)
+      get: () => this.setDateTimeRange(0, 0, 5)
     },
     {
       name: '15 minutes',
-      get: () => this.setTimeInterval(0, 0, 15)
+      get: () => this.setDateTimeRange(0, 0, 15)
     },
     {
       name: '30 minutes',
-      get: () => this.setTimeInterval(0, 0, 30)
+      get: () => this.setDateTimeRange(0, 0, 30)
     },
     {
       name: '1 hour',
-      get: () => this.setTimeInterval(0, 1, 0)
+      get: () => this.setDateTimeRange(0, 1, 0)
     },
     {
       name: '3 hours',
-      get: () => this.setTimeInterval(0, 3, 0)
+      get: () => this.setDateTimeRange(0, 3, 0)
     },
     {
       name: '6 hours',
-      get: () => this.setTimeInterval(0, 6, 0)
+      get: () => this.setDateTimeRange(0, 6, 0)
     },
     {
       name: '12 hours',
-      get: () => this.setTimeInterval(0, 12, 0)
+      get: () => this.setDateTimeRange(0, 12, 0)
     },
     {
       name: '1 day',
-      get: () => this.setTimeInterval(1, 0, 0)
+      get: () => this.setDateTimeRange(1, 0, 0)
     },
     {
       name: '7 days',
-      get: () => this.setTimeInterval(7, 0, 0)
+      get: () => this.setDateTimeRange(7, 0, 0)
     },
     {
       name: '14 days',
-      get: () => this.setTimeInterval(14, 0, 0)
+      get: () => this.setDateTimeRange(14, 0, 0)
     },
     {
       name: '30 days',
-      get: () => this.setTimeInterval(30, 0, 0)
+      get: () => this.setDateTimeRange(30, 0, 0)
     }
   ];
 
-  selectedInterval: any = this.timeIntervals[2];
+  groupByIntervals = [
+    {
+      name: '1 minute',
+      value: 60
+    },
+    {
+      name: '5 minutes',
+      value: 300
+    },
+    {
+      name: '15 minutes',
+      value: 900
+    },
+    {
+      name: '30 minutes',
+      value: 1800
+    },
+    {
+      name: '1 hour',
+      value: 3600
+    },
+    {
+      name: '6 hours',
+      value: 21600
+    },
+    {
+      name: '1 day',
+      value: 86400
+    }
+  ];
+
+  selectedDateTimeRange: any = this.datetimeRanges[2];
 
   failureItemsPageSize = 10;
   failureItemsPerPage = [5, 10, 25, 50];
@@ -165,8 +197,9 @@ export class ServiceDetailsComponent implements OnInit {
         map(([params, formValues]) => [params['id'] as string, formValues]),
         switchMap(([id, {
           fromDateTime,
-          toDateTime
-        }]) => this.checkService.list(id, fromDateTime.toISOString(), toDateTime.toISOString(), 1)),
+          toDateTime,
+          interval
+        }]) => this.checkService.list(id, fromDateTime.toISOString(), toDateTime.toISOString(), interval)),
         map(checks => checks.reverse()),
       )
       .subscribe(checks => {
@@ -193,7 +226,7 @@ export class ServiceDetailsComponent implements OnInit {
       });
   }
 
-  setTimeInterval(days: number, hours: number, minutes: number) {
+  setDateTimeRange(days: number, hours: number, minutes: number) {
     this.dateTimeRangeFormGroup.get('toDateTime').setValue(new Date());
 
     const fromDate = new Date();
@@ -202,8 +235,12 @@ export class ServiceDetailsComponent implements OnInit {
     this.dateTimeRangeFormGroup.get('fromDateTime').setValue(fromDate);
   }
 
-  onSelectionChange($event: MatSelectChange) {
-    this.timeIntervals.find(timeInterval => timeInterval.name === $event.value)?.get();
+  onDateTimeRangeSelectionChange($event: MatSelectChange): void {
+    this.datetimeRanges.find(dateTimeRange => dateTimeRange.name === $event.value)?.get();
+  }
+
+  onIntervalSelectionChange($event: MatSelectChange): void {
+
   }
 
   onFailurePageChanged(pageEvent: PageEvent) {
